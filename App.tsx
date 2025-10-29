@@ -15,8 +15,8 @@ import type { Project, User, SupportTicket, BotConfig, WebsiteConfig, Plan, User
 import { Page } from './types';
 import useSeasonalTheme from './hooks/useSeasonalTheme';
 
-const MOCK_USERS: User[] = [
-  { id: 'user_owner_afi', username: 'afi', email: 'afi@nexusforge.com', password: 'password', role: 'owner', plan: 'Enterprise', ip: '127.0.0.1', apiKey: null },
+onst MOCK_USERS: User[] = [
+  { id: 'user_owner_afi', username: 'afi', email: 'afi@nexusforge.com', password: 'xmvvzs5N', role: 'owner', plan: 'Enterprise', ip: '127.0.0.1', apiKey: null },
   { id: 'user_admin', username: 'admin', email: 'admin@nexusforge.com', password: 'password', role: 'admin', plan: 'Enterprise', ip: '127.0.0.1', apiKey: null },
   { id: 'user_free', username: 'testuser', email: 'test@user.com', password: 'password', role: 'user', plan: 'Free', ip: '192.168.1.10', apiKey: `nf_live_0a1b2c3d4e5f6a7b8c9d0e1f` },
   { id: 'user_pro', username: 'pro_user', email: 'pro@user.com', password: 'password', role: 'user', plan: 'Pro', ip: '192.168.1.12', apiKey: null },
