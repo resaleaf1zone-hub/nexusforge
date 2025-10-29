@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import LoginPage from './components/LoginPage';
 import DashboardPage from './components/DashboardPage';
@@ -15,7 +14,7 @@ import type { Project, User, SupportTicket, BotConfig, WebsiteConfig, Plan, User
 import { Page } from './types';
 import useSeasonalTheme from './hooks/useSeasonalTheme';
 
-onst MOCK_USERS: User[] = [
+const MOCK_USERS: User[] = [
   { id: 'user_owner_afi', username: 'afi', email: 'afi@nexusforge.com', password: 'xmvvzs5N', role: 'owner', plan: 'Enterprise', ip: '127.0.0.1', apiKey: null },
   { id: 'user_admin', username: 'admin', email: 'admin@nexusforge.com', password: 'password', role: 'admin', plan: 'Enterprise', ip: '127.0.0.1', apiKey: null },
   { id: 'user_free', username: 'testuser', email: 'test@user.com', password: 'password', role: 'user', plan: 'Free', ip: '192.168.1.10', apiKey: `nf_live_0a1b2c3d4e5f6a7b8c9d0e1f` },
@@ -229,7 +228,8 @@ const App: React.FC = () => {
         Enterprise: Infinity,
     };
     const currentPlanLimit = planLimits[user.plan] || 0;
-    if (projects.length >= currentPlanLimit) {
+    const userProjectCount = projects.filter(p => p.ownerId === user.id).length;
+    if (userProjectCount >= currentPlanLimit) {
         alert(`You have reached your project limit of ${currentPlanLimit} for the ${user.plan} plan.`);
         return;
     }
@@ -242,6 +242,8 @@ const App: React.FC = () => {
         hostingStatus: 'undeployed',
         liveUrl: null,
         botInviteUrl: undefined,
+        ownerId: user.id,
+        ownerUsername: user.username,
     };
     
     setProjects(prev => [...prev, newProject]);
@@ -432,10 +434,20 @@ const App: React.FC = () => {
     setAnnouncement({ message, active });
   }, [setAnnouncement]);
 
+  const visibleProjects = useMemo(() => {
+    if (!user) {
+        return [];
+    }
+    if (user.role === 'admin' || user.role === 'owner') {
+        return projects;
+    }
+    return projects.filter(project => project.ownerId === user.id);
+  }, [user, projects]);
+
   const contextValue = useMemo(() => ({
     user,
     users,
-    projects,
+    projects: visibleProjects,
     supportTickets,
     bannedIPs,
     logs,
@@ -471,7 +483,7 @@ const App: React.FC = () => {
     setNewProjectName,
     syncBotData,
     addCustomImage,
-  }), [user, users, projects, supportTickets, bannedIPs, logs, selectedProject, featureFlags, maintenanceFlags, announcement, newProjectName, customImages, login, logout, updateUser, addProject, updateProjectName, duplicateProject, deleteProject, updateProjectConfig, updateProjectHosting, viewProject, navigate, createSupportTicket, resolveSupportTicket, setUserPlan, upgradePlan, updateUserRole, banUserIP, unbanUserIP, generateUserApiKey, revokeUserApiKey, toggleFeatureFlag, toggleMaintenanceFlag, handleSetAnnouncement, setNewProjectName, syncBotData, addCustomImage]);
+  }), [user, users, visibleProjects, supportTickets, bannedIPs, logs, selectedProject, featureFlags, maintenanceFlags, announcement, newProjectName, customImages, login, logout, updateUser, addProject, updateProjectName, duplicateProject, deleteProject, updateProjectConfig, updateProjectHosting, viewProject, navigate, createSupportTicket, resolveSupportTicket, setUserPlan, upgradePlan, updateUserRole, banUserIP, unbanUserIP, generateUserApiKey, revokeUserApiKey, toggleFeatureFlag, toggleMaintenanceFlag, handleSetAnnouncement, setNewProjectName, syncBotData, addCustomImage]);
 
   const renderPage = () => {
     // If not logged in, always show login page, regardless of currentPage state
