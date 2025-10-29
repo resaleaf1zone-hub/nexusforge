@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NexusForge: Bot & Web Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Creepster&family=Mountains+of+Christmas:wght@700&family=Roboto:wght@400;700&family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+      body {
+        --primary-color: #3b82f6; /* Default Blue */
+        --primary-hover-color: #2563eb;
+        --primary-shadow-color: rgba(59, 130, 246, 0.2);
+        font-family: 'Inter', sans-serif;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #1f2937; /* A slightly lighter shade of the main bg */
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #4b5563;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-color);
+      }
+      
+      /* Animation Keyframes */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes pageFadeIn {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      @keyframes slideInFromTop {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+       @keyframes slideInFromBottom {
+        from { opacity: 0; transform: translateY(50px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes staggeredFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes snowfall {
+        0% { background-position: 0 0; }
+        100% { background-position: 50px 1000px; }
+      }
+      @keyframes pulse-glow {
+        0%, 100% {
+          box-shadow: 0 0 15px 0 var(--primary-shadow-color);
+        }
+        50% {
+           box-shadow: 0 0 25px 5px var(--primary-shadow-color);
+        }
+      }
+
+      .animate-page-fade-in {
+        animation: pageFadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+      }
+      .animate-slide-in-top {
+        animation: slideInFromTop 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      }
+      .animate-slide-in-bottom {
+        animation: slideInFromBottom 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      }
+      .stagger-fade-in {
+        animation: staggeredFadeIn 0.5s ease-out forwards;
+        opacity: 0;
+      }
+      .animate-pulse-glow {
+          animation: pulse-glow 2s infinite ease-in-out;
+      }
+      
+      /* Seasonal Themes */
+      .theme-halloween {
+        --primary-color: #f97316;
+        --primary-hover-color: #ea580c;
+        --primary-shadow-color: rgba(249, 115, 22, 0.2);
+      }
+      .theme-halloween .seasonal-header {
+        font-family: 'Creepster', cursive;
+        letter-spacing: 2px;
+      }
+      .theme-christmas {
+        --primary-color: #dc2626;
+        --primary-hover-color: #b91c1c;
+        --primary-shadow-color: rgba(220, 38, 38, 0.2);
+      }
+      .theme-christmas .seasonal-header {
+         font-family: 'Mountains of Christmas', cursive;
+         font-weight: 700;
+      }
+      .theme-christmas .snow-bg {
+        background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/13471/snow.png');
+        background-size: 200px 200px; /* Control density of snowflakes */
+        animation: snowfall 20s linear infinite;
+      }
+      
+      /* Tailwind custom color integration */
+      .bg-primary { background-color: var(--primary-color); }
+      .hover\:bg-primary-hover:hover { background-color: var(--primary-hover-color); }
+      .border-primary { border-color: var(--primary-color); }
+      .text-primary { color: var(--primary-color); }
+      .shadow-primary { box-shadow: 0 0 15px 0 var(--primary-shadow-color); }
+      .ring-primary { --tw-ring-color: var(--primary-color); }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react-beautiful-dnd": "https://aistudiocdn.com/react-beautiful-dnd@13.1.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-gray-900 text-gray-100">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
