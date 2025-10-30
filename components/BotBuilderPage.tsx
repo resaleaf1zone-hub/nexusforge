@@ -1,3 +1,4 @@
+
 import React, { useState, useContext, useEffect, useMemo } from 'react';
 import type { Project, BotConfig, CustomCommand, Embed, EmbedField, RoleReward, ReactionRoleConfig, SocialFeed, TicketPanel } from '../types';
 import { AppContext } from '../contexts/AppContext';
@@ -6,69 +7,68 @@ import SupportWidget from './SupportWidget';
 import DeploymentModal from './DeploymentModal';
 import ImageGalleryModal from './ImageGalleryModal';
 
-const featuresConfig: Record<string, { name: string; premium: boolean }[]> = {
+const featuresConfig: Record<string, { name: string; premium: boolean, icon: string }[]> = {
   "Project": [
-    { name: "Deployment", premium: false },
+    { name: "Deployment", premium: false, icon: '🚀' },
   ],
   "Bot Basics": [
-    { name: "Core Configuration", premium: false },
-    { name: "Custom Commands", premium: false },
-    { name: "Embed Builder", premium: false },
+    { name: "Core Configuration", premium: false, icon: '🔧' },
+    { name: "Custom Commands", premium: false, icon: '✨' },
+    { name: "Embed Builder", premium: false, icon: '🎨' },
   ],
   "Pre-built Modules": [
-    { name: "Welcome Messages", premium: false },
-    // Merged "Auto Role Assignment" into Welcome for better UX
-    { name: "Moderation Commands", premium: false },
-    { name: "Auto-Moderation", premium: false },
-    { name: "Leveling System", premium: false },
-    { name: "Reaction Roles", premium: false },
-    { name: "Music Player", premium: false },
-    { name: "Tickets", premium: false },
+    { name: "Welcome Messages", premium: false, icon: '👋' },
+    { name: "Moderation Commands", premium: false, icon: '🛡️' },
+    { name: "Auto-Moderation", premium: false, icon: '🤖' },
+    { name: "Leveling System", premium: false, icon: '🏆' },
+    { name: "Reaction Roles", premium: false, icon: '🎭' },
+    { name: "Music Player", premium: false, icon: '🎵' },
+    { name: "Tickets", premium: false, icon: '🎟️' },
   ],
   "Social & Utility": [
-    { name: "Social Media Notifications", premium: false },
-    { name: "Birthdays", premium: false },
-    { name: "Polls", premium: false },
-    { name: "Suggestions", premium: false },
-    { name: "Starboard", premium: false },
+    { name: "Social Media Notifications", premium: false, icon: '🔔' },
+    { name: "Birthdays", premium: false, icon: '🎉' },
+    { name: "Polls", premium: false, icon: '📊' },
+    { name: "Suggestions", premium: false, icon: '💡' },
+    { name: "Starboard", premium: false, icon: '⭐' },
   ],
   "Integrations": [
-    { name: "Image Scraper", premium: false },
-    { name: "Webhooks Integration", premium: false }, 
-    { name: "IFTTT Integration", premium: false } 
+    { name: "Image Scraper", premium: false, icon: '🖼️' },
+    { name: "Webhooks Integration", premium: false, icon: '🔗' }, 
+    { name: "IFTTT Integration", premium: false, icon: '⚙️' } 
   ],
   "Advanced Features (Coming Soon)": [
-      { name: "Drag & Drop Command Builder", premium: false },
-      { name: "Drag & Drop Event Builder", premium: false },
-      { name: "Interactive Components", premium: false },
-      { name: "Variable System & Data Storage", premium: false },
-      { name: "If/Else Logic & Conditions", premium: false },
-      { name: "Timed Events & Scheduling", premium: false },
+      { name: "Drag & Drop Command Builder", premium: false, icon: '🏗️' },
+      { name: "Drag & Drop Event Builder", premium: false, icon: '🏗️' },
+      { name: "Interactive Components", premium: false, icon: '🏗️' },
+      { name: "Variable System & Data Storage", premium: false, icon: '🏗️' },
+      { name: "If/Else Logic & Conditions", premium: false, icon: '🏗️' },
+      { name: "Timed Events & Scheduling", premium: false, icon: '🏗️' },
   ],
   "Premium Modules": [
-    { name: "Custom Status", premium: true },
-    { name: "Counting", premium: true }, 
-    { name: "ChatGPT", premium: true }, 
-    { name: "Image Generation", premium: true },
-    { name: "Modmail", premium: true }, 
-    { name: "Verification", premium: true },
-    { name: "Auto-React", premium: true },
-    { name: "Global Chat", premium: true }, 
-    { name: "Roblox Verification", premium: true },
-    { name: "Temp Voice Channels", premium: true }, 
-    { name: "Media Channels", premium: true }, 
-    { name: "Invite Tracker", premium: true },
-    { name: "Sticky Roles", premium: true }, 
-    { name: "Statistic Channels", premium: true },
-    { name: "Question Of The Day", premium: true },
-    { name: "Translation", premium: true }, 
-    { name: "Emoji Manager", premium: true },
-    { name: "Sticky Messages", premium: true },
+    { name: "Custom Status", premium: true, icon: '👑' },
+    { name: "Counting", premium: true, icon: '👑' }, 
+    { name: "ChatGPT", premium: true, icon: '👑' }, 
+    { name: "Image Generation", premium: true, icon: '👑' },
+    { name: "Modmail", premium: true, icon: '👑' }, 
+    { name: "Verification", premium: true, icon: '👑' },
+    { name: "Auto-React", premium: true, icon: '👑' },
+    { name: "Global Chat", premium: true, icon: '👑' }, 
+    { name: "Roblox Verification", premium: true, icon: '👑' },
+    { name: "Temp Voice Channels", premium: true, icon: '👑' }, 
+    { name: "Media Channels", premium: true, icon: '👑' }, 
+    { name: "Invite Tracker", premium: true, icon: '👑' },
+    { name: "Sticky Roles", premium: true, icon: '👑' }, 
+    { name: "Statistic Channels", premium: true, icon: '👑' },
+    { name: "Question Of The Day", premium: true, icon: '👑' },
+    { name: "Translation", premium: true, icon: '👑' }, 
+    { name: "Emoji Manager", premium: true, icon: '👑' },
+    { name: "Sticky Messages", premium: true, icon: '👑' },
   ],
 };
 
 const MaintenanceNotice: React.FC<{ featureName: string }> = ({ featureName }) => (
-  <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 bg-gray-800 p-8 rounded-lg border border-gray-700">
+  <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 glass-card p-8 rounded-lg">
       <div className="text-4xl mb-4">⚙️</div>
       <h2 className="text-2xl font-bold text-gray-300 mb-2">{featureName} is in Maintenance</h2>
       <p>This feature is temporarily unavailable. Please check back later.</p>
@@ -76,7 +76,7 @@ const MaintenanceNotice: React.FC<{ featureName: string }> = ({ featureName }) =
 );
 
 const FeaturePlaceholder: React.FC<{ featureName: string }> = ({ featureName }) => (
-  <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 bg-gray-800 p-8 rounded-lg border border-gray-700">
+  <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 glass-card p-8 rounded-lg">
       <h2 className="text-2xl font-bold text-gray-300 mb-2">{featureName}</h2>
       <p>This is an advanced feature currently under development.</p>
       <p className="mt-4 text-yellow-400 text-sm">The full visual builder for this will be available soon!</p>
@@ -92,7 +92,7 @@ const LockIcon = () => (
 const PremiumFeatureLock: React.FC = () => {
     const context = useContext(AppContext);
     return (
-        <div className="bg-gray-800 p-6 rounded-lg border border-yellow-500/30 text-center">
+        <div className="glass-card p-6 rounded-lg border border-yellow-500/30 text-center">
             <h2 className="text-xl font-bold mb-2 text-yellow-400">Premium Feature</h2>
             <p className="text-gray-300">This feature is available on the Pro plan and higher.</p>
             <button onClick={() => context?.upgradePlan('Pro')} className="mt-4 px-5 py-2 bg-primary rounded-lg font-semibold hover:bg-primary-hover transition">Upgrade to Pro</button>
@@ -101,8 +101,8 @@ const PremiumFeatureLock: React.FC = () => {
 };
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-        <h2 className="text-xl font-bold mb-4 border-b border-gray-600 pb-2">{title}</h2>
+    <div className="glass-card p-6 rounded-lg">
+        <h2 className="text-xl font-bold mb-4 border-b border-[var(--border-color)] pb-2">{title}</h2>
         <div className="space-y-4">{children}</div>
     </div>
 );
@@ -112,7 +112,7 @@ const Toggle: React.FC<{ label: string; enabled: boolean; onChange: (enabled: bo
         <span className="text-gray-300">{label}</span>
         <div className="relative">
             <input type="checkbox" className="sr-only" checked={enabled} onChange={e => onChange(e.target.checked)} />
-            <div className={`block w-14 h-8 rounded-full transition ${enabled ? 'bg-primary' : 'bg-gray-600'}`}></div>
+            <div className={`block w-14 h-8 rounded-full transition ${enabled ? 'bg-primary' : 'bg-white/10'}`}></div>
             <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${enabled ? 'transform translate-x-6' : ''}`}></div>
         </div>
     </label>
@@ -121,7 +121,7 @@ const Toggle: React.FC<{ label: string; enabled: boolean; onChange: (enabled: bo
 const TextInput: React.FC<{ label: string; value: string; onChange: (value: string) => void; placeholder?: string }> = ({ label, value, onChange, placeholder }) => (
     <div>
         <label className="block text-sm font-medium text-gray-400 mb-1">{label}</label>
-        <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-gray-700 p-2 rounded-md focus:ring-2 focus:ring-primary outline-none" />
+        <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-white/5 p-2 rounded-md focus:ring-2 focus:ring-primary outline-none border border-transparent focus:border-primary transition font-mono" />
     </div>
 );
 
@@ -132,7 +132,7 @@ const SelectInput: React.FC<{ label: string; value: string; onChange: (value: st
     <div>
         <label className="block text-sm font-medium text-gray-400 mb-1">{label}</label>
         <div className="relative">
-            <select value={value} onChange={e => onChange(e.target.value)} className="w-full bg-gray-700 p-2 rounded-md focus:ring-2 focus:ring-primary outline-none appearance-none pr-8">
+            <select value={value} onChange={e => onChange(e.target.value)} className="w-full bg-white/5 p-2 rounded-md focus:ring-2 focus:ring-primary outline-none appearance-none pr-8 border border-transparent focus:border-primary transition">
                 {(!options || options.length === 0) && <option value="">{placeholder || 'No options available'}</option>}
                 {options.map(opt => <option key={opt} value={opt.startsWith('#') ? opt.substring(1) : opt}>{opt}</option>)}
             </select>
@@ -144,7 +144,7 @@ const SelectInput: React.FC<{ label: string; value: string; onChange: (value: st
 );
 
 const CommandExampleUI: React.FC<{ command: string; description: string; responseTitle: string; responseBody: React.ReactNode; }> = ({ command, description, responseTitle, responseBody }) => (
-    <div className="bg-gray-900/50 p-4 rounded-lg mt-4 border border-gray-700">
+    <div className="bg-black/20 p-4 rounded-lg mt-4 border border-[var(--border-color)]">
         <h3 className="text-md font-bold text-gray-300 mb-2">Usage Example</h3>
         <p className="font-mono text-sm text-gray-400 mb-2"><span className="text-primary">User types:</span> {command}</p>
         <p className="text-sm text-gray-400 mb-4">{description}</p>
@@ -181,7 +181,7 @@ const CoreSettings: React.FC<{ config: BotConfig, updateConfigValue: (path: stri
             <TextInput label="Discord Client ID" value={config.clientId} onChange={v => updateConfigValue(['clientId'], v)} placeholder="Paste your bot's Client ID here" />
             <p className="text-xs text-gray-500 mt-1">The Client ID is used to create an invite link for your bot.</p>
             
-            <div className="pt-4 mt-4 border-t border-gray-700">
+            <div className="pt-4 mt-4 border-t border-[var(--border-color)]">
                 <h3 className="text-lg font-bold text-gray-200 mb-2">Bot Profile</h3>
                 <p className="text-sm text-gray-400 mb-4">Customize your bot's appearance on Discord.</p>
                 
@@ -194,7 +194,7 @@ const CoreSettings: React.FC<{ config: BotConfig, updateConfigValue: (path: stri
                     />
                     <div className="flex-grow">
                         <TextInput label="Bot Avatar URL" value={config.avatarUrl} onChange={v => updateConfigValue(['avatarUrl'], v)} placeholder="https://..." />
-                        <button type="button" onClick={() => openGallery('avatar')} className="mt-2 px-3 py-1 text-xs bg-gray-600 hover:bg-gray-500 rounded-md">
+                        <button type="button" onClick={() => openGallery('avatar')} className="mt-2 px-3 py-1 text-xs bg-white/10 hover:bg-white/20 rounded-md">
                             Select from Gallery
                         </button>
                     </div>
@@ -203,7 +203,7 @@ const CoreSettings: React.FC<{ config: BotConfig, updateConfigValue: (path: stri
                 {/* Banner */}
                 <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-400 mb-1">Bot Banner Preview</label>
-                    <div className="w-full h-24 bg-gray-700 rounded-md flex items-center justify-center overflow-hidden">
+                    <div className="w-full h-24 bg-white/5 rounded-md flex items-center justify-center overflow-hidden">
                         {config.bannerUrl ? (
                             <img src={config.bannerUrl} alt="Bot Banner Preview" className="w-full h-full object-cover" />
                         ) : (
@@ -212,14 +212,14 @@ const CoreSettings: React.FC<{ config: BotConfig, updateConfigValue: (path: stri
                     </div>
                     <div className="flex-grow mt-2">
                         <TextInput label="Bot Banner URL" value={config.bannerUrl} onChange={v => updateConfigValue(['bannerUrl'], v)} placeholder="https://..." />
-                        <button type="button" onClick={() => openGallery('banner')} className="mt-2 px-3 py-1 text-xs bg-gray-600 hover:bg-gray-500 rounded-md">
+                        <button type="button" onClick={() => openGallery('banner')} className="mt-2 px-3 py-1 text-xs bg-white/10 hover:bg-white/20 rounded-md">
                             Select from Gallery
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div className="pt-4 mt-4 border-t border-gray-700">
+            <div className="pt-4 mt-4 border-t border-[var(--border-color)]">
                 <h3 className="text-lg font-bold text-gray-200 mb-2">Server Data Sync</h3>
                 <p className="text-sm text-gray-400 mb-4">Click to fetch your server's channels and roles. This will populate dropdowns throughout the builder. (Uses mock data for this demo)</p>
                 <button onClick={handleSync} className="px-4 py-2 bg-indigo-600 rounded-md hover:bg-indigo-700 transition font-semibold">
@@ -256,7 +256,7 @@ const WelcomerSettings: React.FC<{ config: BotConfig, updateConfigValue: (path: 
                     <SelectInput label="Welcome Channel" value={config.features.welcomeMessage.channel} onChange={v => updateConfigValue(['features', 'welcomeMessage', 'channel'], v)} options={config.syncedChannels || []} placeholder="Sync channels to select..." />
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">Welcome Message</label>
-                        <textarea value={config.features.welcomeMessage.message} onChange={e => updateConfigValue(['features', 'welcomeMessage', 'message'], e.target.value)} rows={3} className="w-full bg-gray-700 p-2 rounded-md" />
+                        <textarea value={config.features.welcomeMessage.message} onChange={e => updateConfigValue(['features', 'welcomeMessage', 'message'], e.target.value)} rows={3} className="w-full bg-white/5 p-2 rounded-md" />
                         <p className="text-xs text-gray-500 mt-1">Use {'{user}'} for user mention and {'{server}'} for server name.</p>
                     </div>
                 </div>}
@@ -266,8 +266,8 @@ const WelcomerSettings: React.FC<{ config: BotConfig, updateConfigValue: (path: 
                 <Toggle label="Send Welcome Card on Join" enabled={config.features.welcomeMessage.sendCard} onChange={v => updateConfigValue(['features', 'welcomeMessage', 'sendCard'], v)} />
                 {config.features.welcomeMessage.sendCard && <div className="space-y-4 animate-fade-in">
                     <TextInput label="Card Title" value={config.features.welcomeMessage.cardConfig.title} onChange={v => updateConfigValue(['features', 'welcomeMessage', 'cardConfig', 'title'], v)} />
-                    <label className="flex justify-between items-center text-sm">Background Color <input type="color" value={config.features.welcomeMessage.cardConfig.backgroundColor} onChange={e => updateConfigValue(['features', 'welcomeMessage', 'cardConfig', 'backgroundColor'], e.target.value)} className="bg-gray-800"/></label>
-                    <label className="flex justify-between items-center text-sm">Text Color <input type="color" value={config.features.welcomeMessage.cardConfig.textColor} onChange={e => updateConfigValue(['features', 'welcomeMessage', 'cardConfig', 'textColor'], e.target.value)} className="bg-gray-800"/></label>
+                    <label className="flex justify-between items-center text-sm">Background Color <input type="color" value={config.features.welcomeMessage.cardConfig.backgroundColor} onChange={e => updateConfigValue(['features', 'welcomeMessage', 'cardConfig', 'backgroundColor'], e.target.value)} className="bg-transparent"/></label>
+                    <label className="flex justify-between items-center text-sm">Text Color <input type="color" value={config.features.welcomeMessage.cardConfig.textColor} onChange={e => updateConfigValue(['features', 'welcomeMessage', 'cardConfig', 'textColor'], e.target.value)} className="bg-transparent"/></label>
                 </div>}
             </Section>
             <Section title="Leave Messages">
@@ -282,14 +282,14 @@ const WelcomerSettings: React.FC<{ config: BotConfig, updateConfigValue: (path: 
                 <p className="text-sm text-gray-400 -mt-2 mb-4">Assign roles to users as soon as they join the server.</p>
                 <div className="space-y-2">
                     {config.features.welcomeMessage.joinRoles.map(role => (
-                        <div key={role} className="flex items-center justify-between bg-gray-700/50 p-2 rounded-md">
+                        <div key={role} className="flex items-center justify-between bg-white/5 p-2 rounded-md">
                             <span className="text-gray-300">{role}</span>
                             <button onClick={() => removeRole(role)} className="text-red-400 hover:text-red-300 text-lg font-bold">×</button>
                         </div>
                     ))}
                 </div>
                 <div className="flex gap-2">
-                    <select value={roleInput} onChange={e => setRoleInput(e.target.value)} className="flex-1 bg-gray-700 p-2 rounded-md outline-none appearance-none pr-8">
+                    <select value={roleInput} onChange={e => setRoleInput(e.target.value)} className="flex-1 bg-white/5 p-2 rounded-md outline-none appearance-none pr-8 border border-transparent focus:border-primary transition">
                         <option value="">Select a role to add...</option>
                         {availableRoles.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
@@ -338,7 +338,7 @@ const AutoModerationSettings: React.FC<{ config: BotConfig, updateConfigValue: (
                 <Toggle label="Anti-Link (delete messages with links)" enabled={config.features.moderation.autoModeration.antiLink} onChange={v => updateConfigValue(['features', 'moderation', 'autoModeration', 'antiLink'], v)} />
                 <div>
                     <label className="block text-sm font-medium text-gray-400 mb-1">Banned Words (comma separated)</label>
-                    <textarea value={bannedWords} onChange={e => handleWordsChange(e.target.value)} rows={3} className="w-full bg-gray-700 p-2 rounded-md" />
+                    <textarea value={bannedWords} onChange={e => handleWordsChange(e.target.value)} rows={3} className="w-full bg-white/5 p-2 rounded-md" />
                     <p className="text-xs text-gray-500 mt-1">The bot will delete any messages containing these words.</p>
                 </div>
             </div>}
@@ -366,7 +366,7 @@ const CustomCommandsSettings: React.FC<{ config: BotConfig, updateConfigValue: (
             <p className="text-sm text-gray-400 -mt-2 mb-4">Create simple text commands. When a user types the trigger, the bot replies with your response.</p>
             <div className="space-y-2 mb-4 max-h-48 overflow-y-auto">
                 {config.customCommands.map(cmd => (
-                    <div key={cmd.id} className="flex items-center justify-between bg-gray-700/50 p-2 rounded-md">
+                    <div key={cmd.id} className="flex items-center justify-between bg-white/5 p-2 rounded-md">
                         <div>
                             <span className="font-mono text-primary">!{cmd.trigger}</span>
                             <span className="text-gray-400 mx-2">&rarr;</span>
@@ -377,8 +377,8 @@ const CustomCommandsSettings: React.FC<{ config: BotConfig, updateConfigValue: (
                 ))}
             </div>
             <div className="flex gap-2">
-              <input type="text" placeholder="!trigger" value={newCommand.trigger} onChange={e => setNewCommand({...newCommand, trigger: e.target.value})} className="flex-1 bg-gray-700 p-2 rounded-md outline-none" />
-              <input type="text" placeholder="Response text" value={newCommand.response} onChange={e => setNewCommand({...newCommand, response: e.target.value})} className="flex-1 bg-gray-700 p-2 rounded-md outline-none" />
+              <input type="text" placeholder="!trigger" value={newCommand.trigger} onChange={e => setNewCommand({...newCommand, trigger: e.target.value})} className="flex-1 bg-white/5 p-2 rounded-md outline-none" />
+              <input type="text" placeholder="Response text" value={newCommand.response} onChange={e => setNewCommand({...newCommand, response: e.target.value})} className="flex-1 bg-white/5 p-2 rounded-md outline-none" />
               <button onClick={addCustomCommand} className="px-4 bg-primary rounded-md hover:bg-primary-hover text-xl font-bold">+</button>
             </div>
         </Section>
@@ -412,22 +412,22 @@ const LevelingSettings: React.FC<{ config: BotConfig, updateConfigValue: (p: str
                     
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">Voice Chat XP Rate (per minute)</label>
-                        <input type="number" value={config.features.leveling.voiceXpRate} onChange={e => updateConfigValue(['features', 'leveling', 'voiceXpRate'], parseInt(e.target.value) || 0)} className="w-full bg-gray-700 p-2 rounded-md" />
+                        <input type="number" value={config.features.leveling.voiceXpRate} onChange={e => updateConfigValue(['features', 'leveling', 'voiceXpRate'], parseInt(e.target.value) || 0)} className="w-full bg-white/5 p-2 rounded-md" />
                     </div>
 
                     <div>
                         <h3 className="text-lg font-bold mb-2 text-gray-300">Role Rewards</h3>
                         <div className="space-y-2 mb-4">
                             {config.features.leveling.roleRewards.map(reward => (
-                                <div key={reward.id} className="flex items-center justify-between bg-gray-700/50 p-2 rounded-md">
+                                <div key={reward.id} className="flex items-center justify-between bg-white/5 p-2 rounded-md">
                                     <span className="text-gray-300">Level <span className="text-primary font-bold">{reward.level}</span> &rarr; <span className="text-purple-400">{reward.roleName}</span></span>
                                     <button onClick={() => removeReward(reward.id)} className="text-red-400 hover:text-red-300 text-lg font-bold">×</button>
                                 </div>
                             ))}
                         </div>
                         <div className="flex gap-2">
-                            <input type="number" placeholder="Level" value={newReward.level} onChange={e => setNewReward({...newReward, level: e.target.value})} className="w-24 bg-gray-700 p-2 rounded-md outline-none" />
-                            <select value={newReward.roleName} onChange={e => setNewReward({...newReward, roleName: e.target.value})} className="flex-1 bg-gray-700 p-2 rounded-md outline-none">
+                            <input type="number" placeholder="Level" value={newReward.level} onChange={e => setNewReward({...newReward, level: e.target.value})} className="w-24 bg-white/5 p-2 rounded-md outline-none" />
+                            <select value={newReward.roleName} onChange={e => setNewReward({...newReward, roleName: e.target.value})} className="flex-1 bg-white/5 p-2 rounded-md outline-none">
                                 <option value="">Select a role...</option>
                                 {(config.syncedRoles || []).map(r => <option key={r} value={r}>{r}</option>)}
                             </select>
@@ -438,9 +438,9 @@ const LevelingSettings: React.FC<{ config: BotConfig, updateConfigValue: (p: str
             </Section>
             <Section title="Level-Up Card Customization">
                  <p className="text-sm text-gray-400 -mt-2 mb-4">Customize the appearance of the rank/level-up card image that appears when users type the !rank command.</p>
-                <label className="flex justify-between items-center text-sm">Background Color <input type="color" value={config.features.leveling.cardConfig.backgroundColor} onChange={e => updateConfigValue(['features', 'leveling', 'cardConfig', 'backgroundColor'], e.target.value)} className="bg-gray-800"/></label>
-                <label className="flex justify-between items-center text-sm">Text Color <input type="color" value={config.features.leveling.cardConfig.textColor} onChange={e => updateConfigValue(['features', 'leveling', 'cardConfig', 'textColor'], e.target.value)} className="bg-gray-800"/></label>
-                <label className="flex justify-between items-center text-sm">XP Bar Color <input type="color" value={config.features.leveling.cardConfig.barColor} onChange={e => updateConfigValue(['features', 'leveling', 'cardConfig', 'barColor'], e.target.value)} className="bg-gray-800"/></label>
+                <label className="flex justify-between items-center text-sm">Background Color <input type="color" value={config.features.leveling.cardConfig.backgroundColor} onChange={e => updateConfigValue(['features', 'leveling', 'cardConfig', 'backgroundColor'], e.target.value)} className="bg-transparent"/></label>
+                <label className="flex justify-between items-center text-sm">Text Color <input type="color" value={config.features.leveling.cardConfig.textColor} onChange={e => updateConfigValue(['features', 'leveling', 'cardConfig', 'textColor'], e.target.value)} className="bg-transparent"/></label>
+                <label className="flex justify-between items-center text-sm">XP Bar Color <input type="color" value={config.features.leveling.cardConfig.barColor} onChange={e => updateConfigValue(['features', 'leveling', 'cardConfig', 'barColor'], e.target.value)} className="bg-transparent"/></label>
             </Section>
         </div>
     );
@@ -465,16 +465,16 @@ const ReactionRolesSettings: React.FC<{ config: BotConfig, updateConfigValue: (p
             {config.features.reactionRoles.enabled && <div className="space-y-4 animate-fade-in">
                 <div className="space-y-2 mb-4">
                     {config.features.reactionRoles.configs.map(rr => (
-                        <div key={rr.id} className="flex items-center justify-between bg-gray-700/50 p-2 rounded-md">
+                        <div key={rr.id} className="flex items-center justify-between bg-white/5 p-2 rounded-md">
                             <span className="text-gray-300 text-sm">Msg <span className="text-primary">{rr.messageId}</span> + {rr.emoji} &rarr; <span className="text-purple-400">{rr.roleName}</span></span>
                             <button onClick={() => removeRR(rr.id)} className="text-red-400 hover:text-red-300 text-lg font-bold">×</button>
                         </div>
                     ))}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                    <input type="text" placeholder="Message ID" value={newRR.messageId} onChange={e => setNewRR({...newRR, messageId: e.target.value})} className="bg-gray-700 p-2 rounded-md" />
-                    <input type="text" placeholder="Emoji" value={newRR.emoji} onChange={e => setNewRR({...newRR, emoji: e.target.value})} className="bg-gray-700 p-2 rounded-md" />
-                    <select value={newRR.roleName} onChange={e => setNewRR({...newRR, roleName: e.target.value})} className="bg-gray-700 p-2 rounded-md">
+                    <input type="text" placeholder="Message ID" value={newRR.messageId} onChange={e => setNewRR({...newRR, messageId: e.target.value})} className="bg-white/5 p-2 rounded-md" />
+                    <input type="text" placeholder="Emoji" value={newRR.emoji} onChange={e => setNewRR({...newRR, emoji: e.target.value})} className="bg-white/5 p-2 rounded-md" />
+                    <select value={newRR.roleName} onChange={e => setNewRR({...newRR, roleName: e.target.value})} className="bg-white/5 p-2 rounded-md">
                         <option value="">Select a role...</option>
                         {(config.syncedRoles || []).map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
@@ -549,7 +549,7 @@ const TicketSettings: React.FC<{ config: BotConfig, updateConfigValue: (p: strin
                     <TextInput label="Embed Title" value={editingPanel.title} onChange={v => updateEditingPanel('title', v)} />
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">Embed Description</label>
-                        <textarea value={editingPanel.description} onChange={e => updateEditingPanel('description', e.target.value)} rows={3} className="w-full bg-gray-700 p-2 rounded-md" />
+                        <textarea value={editingPanel.description} onChange={e => updateEditingPanel('description', e.target.value)} rows={3} className="w-full bg-white/5 p-2 rounded-md" />
                     </div>
                     <div className="flex gap-2">
                         <TextInput label="Button Text" value={editingPanel.buttonText} onChange={v => updateEditingPanel('buttonText', v)} />
@@ -562,14 +562,14 @@ const TicketSettings: React.FC<{ config: BotConfig, updateConfigValue: (p: strin
                         <p className="text-xs text-gray-500 mb-2">These roles will have access to view and respond to tickets.</p>
                         <div className="space-y-2 mb-2">
                             {editingPanel.supportRoles.map(role => (
-                                <div key={role} className="flex items-center justify-between bg-gray-700/50 p-2 rounded-md">
+                                <div key={role} className="flex items-center justify-between bg-white/5 p-2 rounded-md">
                                     <span className="text-gray-300">{role}</span>
                                     <button onClick={() => removeSupportRole(role)} className="text-red-400 hover:text-red-300 text-lg font-bold">×</button>
                                 </div>
                             ))}
                         </div>
                         <div className="flex gap-2">
-                            <select value={roleInput} onChange={e => setRoleInput(e.target.value)} className="flex-1 bg-gray-700 p-2 rounded-md outline-none">
+                            <select value={roleInput} onChange={e => setRoleInput(e.target.value)} className="flex-1 bg-white/5 p-2 rounded-md outline-none">
                                 <option value="">Select a role to add...</option>
                                 {availableRoles.map(r => <option key={r} value={r}>{r}</option>)}
                             </select>
@@ -578,12 +578,12 @@ const TicketSettings: React.FC<{ config: BotConfig, updateConfigValue: (p: strin
                     </div>
                      <div>
                         <label className="block text-sm font-medium text-gray-400 mb-1">Welcome Message in Ticket</label>
-                        <textarea value={editingPanel.welcomeMessage} onChange={e => updateEditingPanel('welcomeMessage', e.target.value)} rows={3} className="w-full bg-gray-700 p-2 rounded-md" />
+                        <textarea value={editingPanel.welcomeMessage} onChange={e => updateEditingPanel('welcomeMessage', e.target.value)} rows={3} className="w-full bg-white/5 p-2 rounded-md" />
                          <p className="text-xs text-gray-500 mt-1">This message is sent in the new ticket channel. Use {'{user}'} for the user mention.</p>
                     </div>
                 </div>
-                 <div className="flex justify-end gap-4 pt-4 mt-4 border-t border-gray-700">
-                    <button onClick={() => setEditingPanel(null)} className="px-4 py-2 bg-gray-600 rounded-md hover:bg-gray-500 transition">Cancel</button>
+                 <div className="flex justify-end gap-4 pt-4 mt-4 border-t border-[var(--border-color)]">
+                    <button onClick={() => setEditingPanel(null)} className="px-4 py-2 bg-white/10 rounded-md hover:bg-white/20 transition">Cancel</button>
                     <button onClick={handleSavePanel} className="px-4 py-2 bg-primary rounded-md hover:bg-primary-hover transition">Save Panel</button>
                 </div>
             </Section>
@@ -619,14 +619,14 @@ const TicketSettings: React.FC<{ config: BotConfig, updateConfigValue: (p: strin
                      <p className="text-sm text-gray-400 -mt-2 mb-4">Each panel is a message with a button that creates a different type of ticket.</p>
                     <div className="space-y-3 mb-4">
                         {ticketConfig.panels.map(panel => (
-                            <div key={panel.id} className="bg-gray-700/50 p-3 rounded-md flex justify-between items-center">
+                            <div key={panel.id} className="bg-white/5 p-3 rounded-md flex justify-between items-center">
                                 <div>
                                     <p className="font-bold text-gray-200">{panel.title}</p>
                                     <p className="text-sm text-gray-400">Channel: <span className="font-mono text-primary">#{panel.channel}</span> | Button: <span className="font-mono text-primary">{panel.buttonText}</span></p>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button onClick={() => { setIsCreating(false); setEditingPanel(panel); }} className="px-3 py-1 text-sm bg-gray-600 hover:bg-gray-500 rounded-md">Edit</button>
-                                    <button onClick={() => handleDeletePanel(panel.id)} className="px-3 py-1 text-sm bg-red-600/50 hover:bg-red-600 rounded-md">Delete</button>
+                                    <button onClick={() => { setIsCreating(false); setEditingPanel(panel); }} className="px-3 py-1 text-sm bg-white/10 hover:bg-white/20 rounded-md">Edit</button>
+                                    <button onClick={() => handleDeletePanel(panel.id)} className="px-3 py-1 text-sm bg-red-600/20 hover:bg-red-600/40 rounded-md">Delete</button>
                                 </div>
                             </div>
                         ))}
@@ -657,19 +657,19 @@ const SocialFeedsSettings: React.FC<{ config: BotConfig, updateConfigValue: (p: 
             <p className="text-sm text-gray-400 -mt-2 mb-4">Automatically post a notification to a Discord channel when you go live on Twitch or upload a new YouTube video.</p>
             <div className="space-y-2 mb-4">
                 {config.features.socialFeeds.map(feed => (
-                    <div key={feed.id} className="flex items-center justify-between bg-gray-700/50 p-2 rounded-md">
+                    <div key={feed.id} className="flex items-center justify-between bg-white/5 p-2 rounded-md">
                         <span className="text-gray-300 text-sm capitalize">{feed.platform}: <span className="text-primary">{feed.username}</span> &rarr; <span className="text-purple-400">#{feed.discordChannel}</span></span>
                          <button onClick={() => removeFeed(feed.id)} className="text-red-400 hover:text-red-300 text-lg font-bold">×</button>
                     </div>
                 ))}
             </div>
              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <select value={newFeed.platform} onChange={e => setNewFeed({...newFeed, platform: e.target.value as SocialFeed['platform']})} className="w-full bg-gray-700 p-2 rounded-md focus:ring-2 focus:ring-primary outline-none appearance-none">
+                <select value={newFeed.platform} onChange={e => setNewFeed({...newFeed, platform: e.target.value as SocialFeed['platform']})} className="w-full bg-white/5 p-2 rounded-md focus:ring-2 focus:ring-primary outline-none appearance-none">
                     <option value="youtube">YouTube</option>
                     <option value="twitch">Twitch</option>
                     <option value="twitter">Twitter/X</option>
                 </select>
-                <input type="text" placeholder="Username/Channel ID" value={newFeed.username} onChange={e => setNewFeed({...newFeed, username: e.target.value})} className="bg-gray-700 p-2 rounded-md" />
+                <input type="text" placeholder="Username/Channel ID" value={newFeed.username} onChange={e => setNewFeed({...newFeed, username: e.target.value})} className="bg-white/5 p-2 rounded-md" />
                 <SelectInput label="" value={newFeed.discordChannel} onChange={v => setNewFeed({...newFeed, discordChannel: v})} options={config.syncedChannels || []} placeholder="Sync to select..." />
             </div>
             <button onClick={addFeed} className="w-full py-2 bg-primary rounded-md hover:bg-primary-hover font-semibold mt-2">Add Notification</button>
@@ -683,13 +683,13 @@ const CustomStatusSettings: React.FC<{ config: BotConfig, updateConfigValue: (p:
         <Toggle label="Enable Custom Status" enabled={config.status.enabled} onChange={v => updateConfigValue(['status', 'enabled'], v)} />
         {config.status.enabled && <div className="space-y-4 animate-fade-in">
             <div className="flex gap-2">
-                <select value={config.status.activityType} onChange={e => updateConfigValue(['status', 'activityType'], e.target.value)} className="bg-gray-700 p-2 rounded-md appearance-none">
+                <select value={config.status.activityType} onChange={e => updateConfigValue(['status', 'activityType'], e.target.value)} className="bg-white/5 p-2 rounded-md appearance-none">
                     <option value="playing">Playing</option>
                     <option value="watching">Watching</option>
                     <option value="listening">Listening to</option>
                     <option value="competing">Competing in</option>
                 </select>
-                <input type="text" placeholder="your status message" value={config.status.text} onChange={e => updateConfigValue(['status', 'text'], e.target.value)} className="flex-1 bg-gray-700 p-2 rounded-md" />
+                <input type="text" placeholder="your status message" value={config.status.text} onChange={e => updateConfigValue(['status', 'text'], e.target.value)} className="flex-1 bg-white/5 p-2 rounded-md" />
             </div>
         </div>}
     </Section>
@@ -742,9 +742,9 @@ const EmbedBuilderUI: React.FC<{ config: BotConfig, updateConfigValue: (p: strin
             <div className="flex flex-col lg:flex-row gap-6 lg:h-[65vh]">
                 <div className="lg:w-1/3 flex flex-col">
                     <button onClick={createEmbed} className="w-full py-2 mb-2 bg-primary rounded-md font-semibold hover:bg-primary-hover">+ New Embed</button>
-                    <div className="bg-gray-900/50 rounded-md p-2 flex-grow overflow-y-auto max-h-40 lg:max-h-full">
+                    <div className="bg-black/20 rounded-md p-2 flex-grow overflow-y-auto max-h-40 lg:max-h-full">
                         {config.embeds.map(embed => (
-                            <button key={embed.id} onClick={() => setSelectedEmbedId(embed.id)} className={`w-full text-left p-2 rounded-md text-sm ${selectedEmbedId === embed.id ? 'bg-primary/50' : 'hover:bg-gray-700'}`}>{embed.name}</button>
+                            <button key={embed.id} onClick={() => setSelectedEmbedId(embed.id)} className={`w-full text-left p-2 rounded-md text-sm ${selectedEmbedId === embed.id ? 'bg-primary/50' : 'hover:bg-white/10'}`}>{embed.name}</button>
                         ))}
                     </div>
                 </div>
@@ -756,15 +756,15 @@ const EmbedBuilderUI: React.FC<{ config: BotConfig, updateConfigValue: (p: strin
                             <TextInput label="Title" value={selectedEmbed.title} onChange={v => updateSelectedEmbed('title', v)} />
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
-                                <textarea value={selectedEmbed.description} onChange={e => updateSelectedEmbed('description', e.target.value)} rows={4} className="w-full bg-gray-700 p-2 rounded-md text-sm"/>
+                                <textarea value={selectedEmbed.description} onChange={e => updateSelectedEmbed('description', e.target.value)} rows={4} className="w-full bg-white/5 p-2 rounded-md text-sm"/>
                             </div>
-                            <label className="flex justify-between items-center text-sm">Color <input type="color" value={selectedEmbed.color} onChange={e => updateSelectedEmbed('color', e.target.value)} className="bg-gray-800"/></label>
+                            <label className="flex justify-between items-center text-sm">Color <input type="color" value={selectedEmbed.color} onChange={e => updateSelectedEmbed('color', e.target.value)} className="bg-transparent"/></label>
                             <TextInput label="Footer Text" value={selectedEmbed.footer} onChange={v => updateSelectedEmbed('footer', v)} />
                             <h3 className="text-md font-bold pt-2 border-t border-gray-600">Fields</h3>
                             {selectedEmbed.fields.map(field => (
-                                <div key={field.id} className="bg-gray-700/50 p-2 rounded-md space-y-2">
-                                    <input type="text" placeholder="Field Name" value={field.name} onChange={e => updateField(field.id, 'name', e.target.value)} className="w-full bg-gray-600 p-1 rounded-sm text-xs"/>
-                                    <input type="text" placeholder="Field Value" value={field.value} onChange={e => updateField(field.id, 'value', e.target.value)} className="w-full bg-gray-600 p-1 rounded-sm text-xs"/>
+                                <div key={field.id} className="bg-white/5 p-2 rounded-md space-y-2">
+                                    <input type="text" placeholder="Field Name" value={field.name} onChange={e => updateField(field.id, 'name', e.target.value)} className="w-full bg-black/20 p-1 rounded-sm text-xs"/>
+                                    <input type="text" placeholder="Field Value" value={field.value} onChange={e => updateField(field.id, 'value', e.target.value)} className="w-full bg-black/20 p-1 rounded-sm text-xs"/>
                                     <div className="flex justify-between items-center">
                                         <label className="flex items-center space-x-2 text-sm text-gray-300">
                                             <input type="checkbox" checked={field.inline} onChange={e => updateField(field.id, 'inline', e.target.checked)} className="form-checkbox h-4 w-4 rounded bg-gray-800 border-gray-600 text-primary focus:ring-primary"/>
@@ -774,7 +774,7 @@ const EmbedBuilderUI: React.FC<{ config: BotConfig, updateConfigValue: (p: strin
                                     </div>
                                 </div>
                             ))}
-                            <button onClick={addField} className="w-full py-1 text-sm bg-gray-600 rounded-md hover:bg-gray-500">+ Add Field</button>
+                            <button onClick={addField} className="w-full py-1 text-sm bg-white/10 rounded-md hover:bg-white/20">+ Add Field</button>
                         </> : <p className="text-gray-500">Select or create an embed to start.</p>}
                     </div>
                     <div className="lg:w-1/2 bg-[#313338] p-4 rounded-lg flex-shrink-0">
@@ -855,7 +855,7 @@ export const BotBuilderPage: React.FC<{ project: Project | null }> = ({ project 
       return (
         <Section title="Bot Deployment">
           <p className="text-sm text-gray-400 -mt-2 mb-4">Deploy your bot, manage its status, and get the code needed to run it yourself.</p>
-           <div className="bg-gray-700/50 p-4 rounded-lg text-center">
+           <div className="bg-black/20 p-4 rounded-lg text-center">
               <p className="font-semibold text-lg">Current Status: <span className={`capitalize ${project?.hostingStatus === 'online' ? 'text-green-400' : project?.hostingStatus === 'deploying' ? 'text-yellow-400' : 'text-gray-400'}`}>{project?.hostingStatus}</span></p>
               {project?.botInviteUrl && project.hostingStatus === 'online' && (
                 <div className="mt-4">
@@ -912,31 +912,33 @@ export const BotBuilderPage: React.FC<{ project: Project | null }> = ({ project 
   }
 
   const sidebarContent = (
-    <aside className="w-64 bg-gray-800 p-4 border-r border-gray-700 overflow-y-auto">
-      {Object.entries(featuresConfig).map(([category, features]) => (
-        <div key={category}>
-          <h3 className="text-xs uppercase text-gray-500 font-bold mt-4 mb-2 px-2">{category}</h3>
-          {features.map(feature => {
-              const isLocked = feature.premium && (context?.user?.plan !== 'Pro' && context?.user?.plan !== 'Enterprise');
-              return (
-                <button 
-                  key={feature.name} 
-                  onClick={() => {
-                      if (!isLocked) {
-                          setActiveFeature(feature.name);
-                          setSidebarOpen(false); // Close sidebar on selection in mobile
-                      }
-                  }}
-                  className={`w-full text-left p-2 rounded-md transition-colors text-sm font-medium flex items-center justify-between ${activeFeature === feature.name && !isLocked ? 'bg-primary text-white' : 'hover:bg-gray-700/50 text-gray-300'} ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  title={isLocked ? "Upgrade to Pro to use this feature" : ""}
-                >
-                  {feature.name}
-                  {isLocked && <LockIcon />}
-                </button>
-              )
-          })}
-        </div>
-      ))}
+    <aside className="w-64 bg-black/30 backdrop-blur-lg flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-4">
+        {Object.entries(featuresConfig).map(([category, features]) => (
+          <div key={category}>
+            <h3 className="text-xs uppercase text-gray-500 font-bold mt-4 mb-2 px-2">{category}</h3>
+            {features.map(feature => {
+                const isLocked = feature.premium && (context?.user?.plan !== 'Pro' && context?.user?.plan !== 'Enterprise');
+                return (
+                  <button 
+                    key={feature.name} 
+                    onClick={() => {
+                        if (!isLocked) {
+                            setActiveFeature(feature.name);
+                            setSidebarOpen(false); // Close sidebar on selection in mobile
+                        }
+                    }}
+                    className={`w-full text-left p-2 rounded-md transition-colors text-sm font-medium flex items-center justify-between gap-3 ${activeFeature === feature.name && !isLocked ? 'bg-primary text-white' : 'hover:bg-white/10 text-gray-300'} ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    title={isLocked ? "Upgrade to Pro to use this feature" : ""}
+                  >
+                    <span className="flex items-center gap-3"><span className="w-4 text-center">{feature.icon}</span> {feature.name}</span>
+                    {isLocked && <LockIcon />}
+                  </button>
+                )
+            })}
+          </div>
+        ))}
+      </div>
     </aside>
   );
 
@@ -951,10 +953,13 @@ export const BotBuilderPage: React.FC<{ project: Project | null }> = ({ project 
   const isButtonDisabled = project.hostingStatus === 'deploying';
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900 text-gray-200">
-      <header className="flex justify-between items-center p-4 bg-gray-800 border-b border-gray-700 flex-shrink-0 z-20">
-        <div className="flex items-center gap-4">
-            <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="lg:hidden p-2 rounded-md hover:bg-gray-700">
+    <div className="flex flex-col h-screen bg-grid text-gray-200">
+      <header className="flex justify-between items-center p-4 bg-black/30 backdrop-blur-lg border-b border-[var(--border-color)] flex-shrink-0 z-20">
+        <div className="flex items-center gap-2">
+            <button onClick={() => context?.navigate(Page.DASHBOARD)} className="p-2 rounded-md hover:bg-white/10 lg:hidden">
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+            </button>
+            <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-2 rounded-md hover:bg-white/10 lg:hidden">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
                 </svg>
@@ -962,7 +967,7 @@ export const BotBuilderPage: React.FC<{ project: Project | null }> = ({ project 
             <h1 className="text-xl font-bold truncate">Bot Builder: <span className="text-primary">{project.name}</span></h1>
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
-          <button onClick={() => context?.navigate(Page.DASHBOARD)} className="hidden sm:block px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-md hover:bg-gray-600 transition">
+          <button onClick={() => context?.navigate(Page.DASHBOARD)} className="hidden lg:block px-4 py-2 text-sm font-medium text-white bg-white/5 rounded-md hover:bg-white/10 transition">
             Dashboard
           </button>
           <button onClick={handleManageHosting} disabled={isButtonDisabled} className="px-3 sm:px-5 py-2 bg-green-600 rounded-lg font-semibold hover:bg-green-700 transition-transform transform hover:scale-105 text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100">
@@ -970,19 +975,19 @@ export const BotBuilderPage: React.FC<{ project: Project | null }> = ({ project 
           </button>
         </div>
       </header>
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 overflow-y-hidden relative">
         {/* Mobile Sidebar */}
-        <div className={`fixed lg:hidden top-0 left-0 h-full z-30 transition-transform transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+        <div className={`fixed lg:hidden top-0 left-0 h-full z-40 transition-transform transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} border-r border-[var(--border-color)]`}>
              {sidebarContent}
         </div>
-        {isSidebarOpen && <div onClick={() => setSidebarOpen(false)} className="fixed lg:hidden inset-0 bg-black/50 z-20"></div>}
+        {isSidebarOpen && <div onClick={() => setSidebarOpen(false)} className="fixed lg:hidden inset-0 bg-black/50 z-30"></div>}
 
         {/* Desktop Sidebar */}
-        <div className="hidden lg:block flex-shrink-0">
+        <div className="hidden lg:flex flex-shrink-0 h-full">
             {sidebarContent}
         </div>
         
-        <main className="flex-1 p-4 sm:p-6 bg-gray-900 overflow-y-auto">
+        <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
           {renderFeatureUI()}
         </main>
       </div>
