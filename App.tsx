@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import LoginPage from './components/LoginPage';
 import DashboardPage from './components/DashboardPage';
@@ -10,7 +11,7 @@ import TemplateMarketplacePage from './components/TemplateMarketplacePage';
 import AnnouncementPopup from './components/AnnouncementPopup';
 import PaymentModal from './components/PaymentModal';
 import { AppContext } from './contexts/AppContext';
-import type { Project, User, SupportTicket, BotConfig, WebsiteConfig, Plan, UserRole, SystemLog } from './types';
+import type { Project, User, SupportTicket, BotConfig, WebsiteConfig, Plan, UserRole, SystemLog, WebsiteTemplate } from './types';
 import { Page } from './types';
 import useSeasonalTheme from './hooks/useSeasonalTheme';
 
@@ -56,10 +57,12 @@ function usePersistentState<T>(key: string, defaultValue: T): [T, React.Dispatch
 
 
 const MaintenanceNotice: React.FC<{ featureName: string }> = ({ featureName }) => (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-center">
-        <div className="text-6xl mb-4">⚙️</div>
-        <h1 className="text-4xl font-bold text-gray-100">Under Maintenance</h1>
-        <p className="mt-2 text-gray-400 max-w-md">The {featureName} is currently undergoing scheduled maintenance to improve your experience. Please check back soon!</p>
+    <div className="flex flex-col items-center justify-center h-screen text-center p-4">
+        <div className="p-8 rounded-2xl max-w-lg text-center glass-card border-yellow-500/50 shadow-lg shadow-yellow-500/10">
+            <div className="text-6xl mb-4">⚙️</div>
+            <h1 className="text-4xl font-bold text-yellow-300">Under Maintenance</h1>
+            <p className="mt-2 text-gray-400">The <span className="font-semibold text-yellow-300">{featureName}</span> feature is currently undergoing scheduled maintenance to improve your experience. Please check back soon!</p>
+        </div>
     </div>
 );
 
@@ -75,6 +78,7 @@ const App: React.FC = () => {
   const [planToUpgrade, setPlanToUpgrade] = useState<{ plan: Plan; cycle: 'monthly' | 'yearly' } | null>(null);
   const [newProjectName, setNewProjectName] = useState<string | null>(null);
   const [customImages, setCustomImages] = usePersistentState<string[]>('nexusforge_custom_images', []);
+  const [customTemplates, setCustomTemplates] = usePersistentState<WebsiteTemplate[]>('nexusforge_custom_templates', []);
 
   const [featureFlags, setFeatureFlags] = usePersistentState<{ [key: string]: boolean }>('nexusforge_features', {
     supportSystem: true,
@@ -429,6 +433,10 @@ const App: React.FC = () => {
     setCustomImages(prev => [imageDataUrl, ...prev]);
   }, [setCustomImages]);
 
+  const addCustomTemplate = useCallback((template: WebsiteTemplate) => {
+    setCustomTemplates(prev => [template, ...prev]);
+  }, [setCustomTemplates]);
+
   // FIX: Create a wrapper for setAnnouncement to match the context type definition.
   const handleSetAnnouncement = useCallback((message: string, active: boolean) => {
     setAnnouncement({ message, active });
@@ -457,6 +465,7 @@ const App: React.FC = () => {
     announcement,
     newProjectName,
     customImages,
+    customTemplates,
     login,
     logout,
     updateUser,
@@ -483,7 +492,8 @@ const App: React.FC = () => {
     setNewProjectName,
     syncBotData,
     addCustomImage,
-  }), [user, users, visibleProjects, supportTickets, bannedIPs, logs, selectedProject, featureFlags, maintenanceFlags, announcement, newProjectName, customImages, login, logout, updateUser, addProject, updateProjectName, duplicateProject, deleteProject, updateProjectConfig, updateProjectHosting, viewProject, navigate, createSupportTicket, resolveSupportTicket, setUserPlan, upgradePlan, updateUserRole, banUserIP, unbanUserIP, generateUserApiKey, revokeUserApiKey, toggleFeatureFlag, toggleMaintenanceFlag, handleSetAnnouncement, setNewProjectName, syncBotData, addCustomImage]);
+    addCustomTemplate,
+  }), [user, users, visibleProjects, supportTickets, bannedIPs, logs, selectedProject, featureFlags, maintenanceFlags, announcement, newProjectName, customImages, customTemplates, login, logout, updateUser, addProject, updateProjectName, duplicateProject, deleteProject, updateProjectConfig, updateProjectHosting, viewProject, navigate, createSupportTicket, resolveSupportTicket, setUserPlan, upgradePlan, updateUserRole, banUserIP, unbanUserIP, generateUserApiKey, revokeUserApiKey, toggleFeatureFlag, toggleMaintenanceFlag, handleSetAnnouncement, setNewProjectName, syncBotData, addCustomImage, addCustomTemplate]);
 
   const renderPage = () => {
     // If not logged in, always show login page, regardless of currentPage state
@@ -513,7 +523,7 @@ const App: React.FC = () => {
 
   return (
     <AppContext.Provider value={contextValue}>
-      <div className={`min-h-screen bg-gray-900 text-gray-100 ${seasonalTheme !== 'default' ? `theme-${seasonalTheme}` : ''}`}>
+      <div className={`min-h-screen text-gray-100 ${seasonalTheme !== 'default' ? `theme-${seasonalTheme}` : ''}`}>
         <div key={currentPage} className="animate-page-fade-in">
           {renderPage()}
         </div>
