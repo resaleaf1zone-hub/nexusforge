@@ -1,64 +1,13 @@
+
 import React, { useState, useContext, useMemo, useEffect } from 'react';
-import type { Project, WebsiteConfig, WebsiteCategory, WebsiteSubCategory, WebsitePage, DiscountCode, ShippingOption, ProductVariant, WebsiteProduct, Order } from '../types';
+import type { Project, WebsiteConfig, WebsiteTemplate, WebsiteCategory, WebsiteSubCategory, WebsitePage, DiscountCode, ShippingOption, ProductVariant, WebsiteProduct, Order } from '../types';
 import { AppContext } from '../contexts/AppContext';
 import { Page } from '../types';
 import SupportWidget from './SupportWidget';
 import DeploymentModal from './DeploymentModal';
 import ImageGalleryModal from './ImageGalleryModal';
 
-const websiteFeaturesConfig: Record<string, { name: string; icon: string; premium: boolean; }[]> = {
-  "Site Settings": [
-    { name: "Global Styles", icon: "🎨", premium: false },
-    { name: "SEO & Domains", icon: "🌐", premium: true },
-    { name: "Theme Templates", icon: "✨", premium: false },
-  ],
-  "Pages & Content": [
-    { name: "Page Manager", icon: "📖", premium: false },
-    { name: "Hero Section", icon: "🖼️", premium: false },
-    { name: "About Section", icon: "🧑‍🏫", premium: false },
-    { name: "Contact Section", icon: "📞", premium: false },
-    { name: "Products Section", icon: "📦", premium: false },
-    { name: "Footer", icon: "📑", premium: false },
-  ],
-  "Store": [
-    { name: "E-commerce Settings", icon: "💳", premium: false },
-    { name: "Manage Categories", icon: "🗂️", premium: false },
-    { name: "Manage Products", icon: "🛍️", premium: false },
-    { name: "Orders", icon: "🧾", premium: false },
-    { name: "Product Page Layout", icon: "📄", premium: true },
-    { name: "Discounts", icon: "🏷️", premium: true },
-  ]
-};
-
-const LockIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-400 ml-2" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-    </svg>
-);
-
-const Toggle: React.FC<{ label: string; enabled: boolean; onChange: (enabled: boolean) => void }> = ({ label, enabled, onChange }) => (
-    <label className="flex items-center justify-between cursor-pointer">
-        <span className="text-gray-300">{label}</span>
-        <div className="relative">
-            <input type="checkbox" className="sr-only" checked={enabled} onChange={e => onChange(e.target.checked)} />
-            <div className={`block w-14 h-8 rounded-full transition ${enabled ? 'bg-primary' : 'bg-gray-600'}`}></div>
-            <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform ${enabled ? 'transform translate-x-6' : ''}`}></div>
-        </div>
-    </label>
-);
-
-const TextInput: React.FC<{ label: string; value: string; onChange: (value: string) => void; placeholder?: string; type?: string; }> = ({ label, value, onChange, placeholder, type = 'text' }) => (
-    <div>
-        <label className="block text-sm font-medium text-gray-400 mb-1">{label}</label>
-        <input 
-            type={type}
-            value={value} 
-            onChange={e => onChange(e.target.value)} 
-            placeholder={placeholder} 
-            className="w-full bg-gray-700 p-2 rounded-md focus:ring-2 focus:ring-primary outline-none" 
-        />
-    </div>
-);
+type EditorTab = 'Content' | 'Design' | 'Store' | 'Settings' | 'Analytics';
 
 const themes = {
   modern: {
@@ -78,24 +27,58 @@ const themes = {
   }
 };
 
+const LockIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2 text-yellow-400 inline-block" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+    </svg>
+);
+
 const Section: React.FC<{ title: string; children: React.ReactNode, description?: string, locked?: boolean }> = ({ title, children, description, locked }) => (
-    <div className={`bg-gray-800/50 p-6 rounded-lg border border-gray-700 ${locked ? 'opacity-50' : ''}`}>
-        <h2 className="text-xl font-bold mb-2 border-b border-gray-600 pb-2 flex items-center">{title} {locked && <LockIcon />}</h2>
+    <div className={`glass-card p-6 rounded-lg ${locked ? 'opacity-50' : ''}`}>
+        <h2 className="text-xl font-bold mb-2 border-b border-[var(--border-color)] pb-2 flex items-center">{title} {locked && <LockIcon />}</h2>
         {description && <p className="text-sm text-gray-400 mb-4">{description}</p>}
         <div className={`space-y-4 ${locked ? 'pointer-events-none' : ''}`}>{children}</div>
     </div>
 );
 
+const AnalyticsStatCard: React.FC<{ title: string, value: string | number, change?: string, changeType?: 'increase' | 'decrease' }> = ({ title, value, change, changeType }) => (
+    <div className="glass-card p-4 rounded-lg">
+        <p className="text-sm text-gray-400">{title}</p>
+        <p className="text-3xl font-bold text-white">{value}</p>
+        {change && (
+            <p className={`text-xs ${changeType === 'increase' ? 'text-green-400' : 'text-red-400'}`}>
+                {change} vs last period
+            </p>
+        )}
+    </div>
+);
+
+const AnalyticsChart: React.FC<{ data: number[] }> = ({ data }) => {
+    const maxVal = Math.max(...data, 1);
+    const points = data.map((d, i) => `${(i / (data.length - 1)) * 100},${100 - (d / maxVal) * 90}`).join(' ');
+
+    return (
+        <div className="bg-black/20 p-4 rounded-lg h-64">
+             <svg viewBox="0 0 100 100" className="w-full h-full" preserveAspectRatio="none">
+                <polyline
+                    fill="none"
+                    stroke="var(--primary-color)"
+                    strokeWidth="2"
+                    points={points}
+                />
+            </svg>
+        </div>
+    );
+};
+
 
 const WebsiteBuilderPage: React.FC<{ project: Project | null }> = ({ project }) => {
   const context = useContext(AppContext);
   const [config, setConfig] = useState<WebsiteConfig | null>(project?.config as WebsiteConfig || null);
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [isDeploying, setIsDeploying] = useState(false);
   const [isGalleryOpen, setGalleryOpen] = useState(false);
   
-  const [activeFeature, setActiveFeature] = useState<string>("Page Manager");
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [activeEditorTab, setActiveEditorTab] = useState<EditorTab>("Content");
   
   const [editingPageId, setEditingPageId] = useState<string>('home');
   const [previewState, setPreviewState] = useState<{type: 'page', id: string} | {type: 'product', id: string} | {type: 'checkout', cart: WebsiteProduct[]} | {type: 'order_success'}>({type: 'page', id: 'home'});
@@ -103,6 +86,23 @@ const WebsiteBuilderPage: React.FC<{ project: Project | null }> = ({ project }) 
   const [editingProduct, setEditingProduct] = useState<WebsiteProduct | null>(null);
   const [galleryContext, setGalleryContext] = useState<'productImage' | 'descriptionImage' | null>(null);
   const [editingProductIdForImage, setEditingProductIdForImage] = useState<string | null>(null);
+
+  const [analyticsData, setAnalyticsData] = useState({
+    visits: [50, 60, 80, 75, 90, 120, 110], // last 7 days
+    totalVisits: 585,
+    uniqueVisitors: 412,
+    orders: 23,
+    topPages: [
+        { name: 'Home', views: 350 },
+        { name: '/products/astro-gears', views: 120 },
+        { name: '/products/cyber-core', views: 95 },
+    ],
+    referrers: [
+        { name: 'Google', visits: 210 },
+        { name: 'Direct', visits: 150 },
+        { name: 'Twitter', visits: 52 },
+    ]
+});
 
   const currentPage = useMemo(() => config?.pages.find(p => p.id === editingPageId), [config, editingPageId]);
   const isProOrHigher = context?.user?.plan === 'Pro' || context?.user?.plan === 'Enterprise';
@@ -185,6 +185,22 @@ const WebsiteBuilderPage: React.FC<{ project: Project | null }> = ({ project }) 
     updateConfigValue(['theme'], { ...config.theme, ...theme });
   };
   
+  const handleSaveAsTemplate = () => {
+    const name = prompt("Enter a name for your new template:");
+    if (name && config && project) {
+        const newTemplate: WebsiteTemplate = {
+            id: `custom_${Date.now()}`,
+            name: name,
+            description: `A custom template based on '${project.name}'.`,
+            previewImageUrl: 'https://images.unsplash.com/photo-1522204523234-8729aa6e3d5f?q=80&w=800', // A generic placeholder
+            tags: ['Custom'],
+            config: JSON.parse(JSON.stringify(config)) // Deep copy
+        };
+        context?.addCustomTemplate(newTemplate);
+        alert(`Template '${name}' saved successfully! You can find it in the marketplace.`);
+    }
+};
+
   const templateStyles = useMemo(() => {
     if (!config) return '';
 
@@ -599,189 +615,81 @@ const WebsiteBuilderPage: React.FC<{ project: Project | null }> = ({ project }) 
       context?.updateProjectHosting(project.id, 'online', url);
   }
 
-  const renderFeatureUI = () => {
+  const renderEditorDashboard = () => {
     if (!config || !currentPage) return null;
-
-    const pageIndex = config.pages.findIndex(p => p.id === editingPageId);
-
-    const updateSectionValue = (section: keyof WebsitePage['sections'], key: string, value: any) => {
-        updateConfigValue(['pages', pageIndex, 'sections', section, key], value);
-    };
-
-    switch(activeFeature) {
-        case "Manage Products": {
-            const handleSave = () => {
-                if(!editingProduct) return;
-                const productIndex = config.products.findIndex(p => p.id === editingProduct.id);
-                if (productIndex > -1) {
-                    updateConfigValue(['products', productIndex], editingProduct);
-                }
-                setEditingProduct(null);
-            }
-
-            const handleProductImageClick = (productId: string) => {
-                setEditingProductIdForImage(productId);
-                setGalleryContext('productImage');
-                setGalleryOpen(true);
-            };
-
-            if(editingProduct) {
-                return (
-                    <Section title={`Editing: ${editingProduct.name}`} description="Update product details below.">
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="text" placeholder="Product Name" value={editingProduct.name} onChange={e => setEditingProduct({...editingProduct, name: e.target.value})} className="form-input" />
-                            <input type="number" placeholder="Price" value={editingProduct.price} onChange={e => setEditingProduct({...editingProduct, price: parseFloat(e.target.value) || 0})} className="form-input" />
-                             <select value={editingProduct.productType} onChange={e => setEditingProduct({...editingProduct, productType: e.target.value as 'physical'|'digital'})} className="form-input">
-                                <option value="physical">Physical Product</option>
-                                <option value="digital">Digital Product</option>
-                            </select>
-                            <input type="number" placeholder="Sale Price (Optional)" value={editingProduct.salePrice || ''} onChange={e => setEditingProduct({...editingProduct, salePrice: parseFloat(e.target.value) || undefined})} className="form-input" />
-                         </div>
-                         <div>
-                            <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
-                            <div className="bg-gray-700 rounded-md">
-                                <div className="p-2 border-b border-gray-600">
-                                    <button type="button" onClick={() => { setGalleryContext('descriptionImage'); setGalleryOpen(true); }} className="px-3 py-1 text-sm bg-gray-600 hover:bg-gray-500 rounded-md">
-                                        Insert Image
-                                    </button>
-                                </div>
-                                <textarea 
-                                    placeholder="Description" 
-                                    value={editingProduct.description} 
-                                    onChange={e => setEditingProduct({...editingProduct, description: e.target.value})} 
-                                    className="w-full bg-transparent p-2 rounded-md outline-none" 
-                                    rows={6} 
-                                />
-                            </div>
-                        </div>
-                         <div className="flex justify-end gap-4">
-                            <button onClick={() => setEditingProduct(null)} className="px-4 py-2 bg-gray-600 rounded-md">Cancel</button>
-                            <button onClick={handleSave} className="px-4 py-2 bg-primary rounded-md">Save Changes</button>
-                         </div>
-                    </Section>
-                )
-            }
-            
+    
+    switch (activeEditorTab) {
+        case 'Analytics':
             return (
-                <Section title="Manage Products" description="Add, edit, or remove products from your store.">
-                    <div className="space-y-2">
-                        {config.products.map(product => (
-                            <div key={product.id} className="bg-gray-700/50 p-3 rounded-md flex justify-between items-center">
-                                <div className="flex items-center gap-4">
-                                    <img src={product.imageUrl} alt={product.name} className="w-12 h-12 object-cover rounded-md cursor-pointer" onClick={() => handleProductImageClick(product.id)} title="Click to change image" />
-                                    <div>
-                                        <p className="font-bold">{product.name}</p>
-                                        <p className="text-sm text-gray-400">{product.productType === 'digital' ? 'Digital Item' : 'Physical Item'}</p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-2">
-                                    <button onClick={() => setEditingProduct(product)} className="px-3 py-1 text-sm bg-gray-600 rounded-md">Edit</button>
-                                </div>
-                            </div>
-                        ))}
+                <div className="space-y-6 animate-fade-in">
+                    <h2 className="text-2xl font-bold">Site Analytics</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <AnalyticsStatCard title="Total Visits" value={analyticsData.totalVisits} change="+5.2%" changeType="increase" />
+                        <AnalyticsStatCard title="Unique Visitors" value={analyticsData.uniqueVisitors} change="+3.1%" changeType="increase" />
+                        <AnalyticsStatCard title="Orders" value={analyticsData.orders} change="-1.5%" changeType="decrease" />
+                        <AnalyticsStatCard title="Conversion Rate" value={`${((analyticsData.orders / analyticsData.totalVisits) * 100).toFixed(2)}%`} />
                     </div>
-                </Section>
-            );
-        }
-
-        case "Orders": {
-            const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-
-            if(selectedOrder) {
-                return (
-                     <Section title={`Order Details: ${selectedOrder.id}`} description={`Placed on ${new Date(selectedOrder.createdAt).toLocaleString()}`}>
-                        <div>
-                            <h3 className="font-bold mb-2">Customer</h3>
-                            <p className="text-sm">{selectedOrder.customerEmail}</p>
-                        </div>
-                        {selectedOrder.shippingAddress && (
-                            <div>
-                                <h3 className="font-bold mb-2">Shipping Address</h3>
-                                <p className="text-sm">{selectedOrder.shippingAddress.name}</p>
-                                <p className="text-sm">{selectedOrder.shippingAddress.street}</p>
-                                <p className="text-sm">{selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.zip}</p>
-                                <p className="text-sm">{selectedOrder.shippingAddress.country}</p>
-                            </div>
-                        )}
-                        <div>
-                            <h3 className="font-bold mb-2">Items Ordered</h3>
-                            <div className="space-y-2">
-                                {selectedOrder.items.map((item, index) => (
-                                    <div key={item.id + index} className="flex justify-between text-sm bg-gray-700/50 p-2 rounded-md">
-                                        <p>{item.name}</p>
-                                        <p>${(item.salePrice ?? item.price).toFixed(2)}</p>
-                                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold mb-2">Visits (Last 7 Days)</h3>
+                        <AnalyticsChart data={analyticsData.visits} />
+                    </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="glass-card p-4 rounded-lg">
+                            <h3 className="font-bold mb-2">Top Pages</h3>
+                            <ul className="text-sm space-y-2">
+                                {analyticsData.topPages.map(page => (
+                                    <li key={page.name} className="flex justify-between">
+                                        <span className="text-gray-300">{page.name}</span>
+                                        <span className="font-semibold">{page.views} views</span>
+                                    </li>
                                 ))}
-                            </div>
+                            </ul>
                         </div>
-                        <p className="text-right font-bold mt-2">Total: ${selectedOrder.total.toFixed(2)}</p>
-                        <button onClick={() => setSelectedOrder(null)} className="mt-4 px-4 py-2 bg-primary rounded-md">Back to Orders</button>
-                     </Section>
-                )
-            }
-
-            return (
-                <Section title="Orders" description="View and manage incoming orders from your customers.">
-                    <div className="space-y-2">
-                        {config.orders.length === 0 && <p className="text-gray-400 text-center py-4">No orders yet.</p>}
-                        {config.orders.map(order => (
-                            <div key={order.id} className="bg-gray-700/50 p-3 rounded-md flex justify-between items-center">
-                                <div>
-                                    <p className="font-bold">{order.id}</p>
-                                    <p className="text-sm text-gray-400">{order.customerEmail} - {new Date(order.createdAt).toLocaleDateString()}</p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="font-bold">${order.total.toFixed(2)}</p>
-                                    <button onClick={() => setSelectedOrder(order)} className="text-sm text-blue-400 hover:underline">View Details</button>
-                                </div>
-                            </div>
-                        ))}
+                        <div className="glass-card p-4 rounded-lg">
+                            <h3 className="font-bold mb-2">Top Referrers</h3>
+                             <ul className="text-sm space-y-2">
+                                {analyticsData.referrers.map(ref => (
+                                    <li key={ref.name} className="flex justify-between">
+                                        <span className="text-gray-300">{ref.name}</span>
+                                        <span className="font-semibold">{ref.visits} visits</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
-                </Section>
+                </div>
             )
-        }
-        
-        case "SEO & Domains":
-            return (
-                <Section title="SEO & Domains" description="Configure search engine optimization and link your custom domain." locked={!isProOrHigher}>
-                    <input type="text" placeholder="Meta Title" value={config.seo.metaTitle} onChange={e => updateConfigValue(['seo', 'metaTitle'], e.target.value)} className="w-full bg-gray-700 p-2 rounded-md" />
-                    <input type="text" placeholder="Meta Description" value={config.seo.metaDescription} onChange={e => updateConfigValue(['seo', 'metaDescription'], e.target.value)} className="w-full bg-gray-700 p-2 rounded-md" />
-                    <input type="text" placeholder="your-domain.com" value={config.domain.customDomain} onChange={e => updateConfigValue(['domain', 'customDomain'], e.target.value)} className="w-full bg-gray-700 p-2 rounded-md" />
-                    {!isProOrHigher && <p className="text-xs text-yellow-400">Custom Domains are available on the Pro plan and higher.</p>}
-                </Section>
-            );
-        
-        case "E-commerce Settings":
-            return (
-                <Section title="E-commerce Settings" description="Manage payment gateways and shipping options for your store.">
-                    <h3 className="font-bold text-gray-200">Payment Gateways</h3>
-                    <Toggle label="Stripe (Credit Card)" enabled={config.ecommerce.enabledGateways.stripe} onChange={v => updateConfigValue(['ecommerce', 'enabledGateways', 'stripe'], v)} />
-                    {config.ecommerce.enabledGateways.stripe && (
-                        <div className="pl-4 space-y-4 border-l-2 border-gray-700 ml-2 animate-fade-in">
-                            <TextInput label="Stripe Public Key" value={config.ecommerce.stripePublicKey} onChange={v => updateConfigValue(['ecommerce', 'stripePublicKey'], v)} placeholder="pk_live_..." />
-                            <TextInput label="Stripe Secret Key" value={config.ecommerce.stripeSecretKey} onChange={v => updateConfigValue(['ecommerce', 'stripeSecretKey'], v)} placeholder="sk_live_..." type="password" />
-                        </div>
-                    )}
-                    <Toggle label="PayPal" enabled={config.ecommerce.enabledGateways.paypal} onChange={v => updateConfigValue(['ecommerce', 'enabledGateways', 'paypal'], v)} />
-                    <Toggle label="Crypto" enabled={config.ecommerce.enabledGateways.crypto} onChange={v => updateConfigValue(['ecommerce', 'enabledGateways', 'crypto'], v)} />
-                </Section>
-            );
-        
-        case "Discounts":
+        case 'Design':
              return (
-                <Section title="Discount Codes" description="Create and manage discount codes for your customers." locked={!isProOrHigher}>
-                     {!isProOrHigher && <p className="text-xs text-yellow-400">Discount codes are available on the Pro plan and higher.</p>}
-                </Section>
-            );
-
-        default:
+                 <div className="space-y-6 animate-fade-in">
+                    <Section title="Theme Templates" description="Quickly change the overall look and feel of your site.">
+                        <div className="flex gap-4">
+                            <button onClick={() => handleThemeSelect('modern')} className={`w-full p-3 rounded-md transition ${config.template === 'modern' ? 'bg-primary' : 'bg-white/10'}`}>Modern</button>
+                            <button onClick={() => handleThemeSelect('minimalist')} className={`w-full p-3 rounded-md transition ${config.template === 'minimalist' ? 'bg-primary' : 'bg-white/10'}`}>Minimalist</button>
+                            <button onClick={() => handleThemeSelect('bold')} className={`w-full p-3 rounded-md transition ${config.template === 'bold' ? 'bg-primary' : 'bg-white/10'}`}>Bold</button>
+                        </div>
+                    </Section>
+                    <Section title="Save as Template" description="Save your current design and configuration as a reusable template.">
+                         <button onClick={handleSaveAsTemplate} className="w-full py-2 bg-primary/80 hover:bg-primary rounded-md font-semibold transition">Save Current Design as Template</button>
+                    </Section>
+                 </div>
+            )
+        case 'Settings':
             return (
-                <Section title="Editor" description={`Editing: ${activeFeature}`}>
-                    <p className="text-gray-400">Controls for "{activeFeature}" would be displayed here.</p>
-                </Section>
+                 <div className="space-y-6 animate-fade-in">
+                    <Section title="SEO & Domains" description="Configure search engine optimization and link your custom domain." locked={!isProOrHigher}>
+                        {/* TextInput is not defined here, let's create a local one */}
+                        {React.createElement('input', { className: "w-full bg-white/5 p-2 rounded-md", placeholder: "Meta Title", value: config.seo.metaTitle, onChange: e => updateConfigValue(['seo', 'metaTitle'], e.target.value)})}
+                        {React.createElement('input', { className: "w-full bg-white/5 p-2 rounded-md", placeholder: "Meta Description", value: config.seo.metaDescription, onChange: e => updateConfigValue(['seo', 'metaDescription'], e.target.value)})}
+                        {React.createElement('input', { className: "w-full bg-white/5 p-2 rounded-md", placeholder: "your-domain.com", value: config.domain.customDomain, onChange: e => updateConfigValue(['domain', 'customDomain'], e.target.value)})}
+                        {!isProOrHigher && <p className="text-xs text-yellow-400">Custom Domains are available on the Pro plan and higher.</p>}
+                    </Section>
+                 </div>
             );
+        default:
+            return <div className="animate-fade-in"><Section title="Content Editor"><p>Controls for "{activeEditorTab}" would go here.</p></Section></div>
     }
-  };
+  }
   
   if (!project || !config) {
     return (
@@ -791,45 +699,36 @@ const WebsiteBuilderPage: React.FC<{ project: Project | null }> = ({ project }) 
     );
   }
 
+  const editorTabs: EditorTab[] = ['Content', 'Design', 'Store', 'Settings', 'Analytics'];
+
   return (
-    <div className="flex flex-col h-screen bg-gray-900 text-gray-200">
-        <header className="flex justify-between items-center p-4 bg-gray-800 border-b border-gray-700 flex-shrink-0">
-             <h1 className="text-xl font-bold">Website Builder: <span className="text-blue-400">{project.name}</span></h1>
+    <div className="flex flex-col h-screen bg-grid text-gray-200">
+        <header className="flex justify-between items-center p-4 bg-black/30 backdrop-blur-lg border-b border-[var(--border-color)] flex-shrink-0 z-20">
+            <div className="flex items-center gap-2">
+                 <button onClick={() => context?.navigate(Page.DASHBOARD)} className="p-2 rounded-md hover:bg-white/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                 </button>
+                 <h1 className="text-xl font-bold truncate">Website Builder: <span className="text-primary">{project.name}</span></h1>
+            </div>
              <div className="flex items-center gap-4">
-                <button onClick={() => context?.navigate(Page.DASHBOARD)} className="hidden md:block px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-md hover:bg-gray-600 transition">
-                    Back to Dashboard
-                </button>
                 <button onClick={handlePublish} className="px-5 py-2 bg-green-600 rounded-lg font-semibold hover:bg-green-700 transition-transform transform hover:scale-105">Publish</button>
              </div>
         </header>
         <div className="flex flex-1 overflow-hidden">
-            <aside className="w-72 bg-gray-800 p-4 border-r border-gray-700 overflow-y-auto hidden md:block">
-                {Object.entries(websiteFeaturesConfig).map(([category, features]) => (
-                    <div key={category}>
-                        <h3 className="text-xs uppercase text-gray-500 font-bold mt-4 mb-2 px-2">{category}</h3>
-                        {features.map(feature => {
-                            const isLocked = feature.premium && !isProOrHigher;
-                            return (
-                                <button 
-                                    key={feature.name} 
-                                    onClick={() => !isLocked && setActiveFeature(feature.name)} 
-                                    className={`w-full text-left p-2 rounded-md transition-colors text-sm font-medium flex items-center gap-3 ${activeFeature === feature.name && !isLocked ? 'bg-blue-600 text-white' : 'hover:bg-gray-700/50 text-gray-300'} ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    title={isLocked ? "Upgrade to Pro to use this feature" : ""}
-                                >
-                                    <span>{feature.icon}</span>
-                                    <span>{feature.name}</span>
-                                    {isLocked && <LockIcon />}
-                                </button>
-                            );
-                        })}
+            <main className="flex-1 flex flex-col md:flex-row overflow-hidden">
+                <div className="w-full md:w-2/5 lg:w-1/3 flex flex-col border-b md:border-b-0 md:border-r border-[var(--border-color)]">
+                    <div className="p-2 border-b border-[var(--border-color)] overflow-x-auto">
+                        <nav className="flex space-x-2" aria-label="Tabs">
+                            {editorTabs.map(tab => (
+                                 <button key={tab} onClick={() => setActiveEditorTab(tab)} className={`py-2 px-4 text-sm font-medium transition-colors whitespace-nowrap rounded-md ${activeEditorTab === tab ? 'bg-primary text-white' : 'text-gray-400 hover:text-gray-200 hover:bg-white/10'}`}>{tab}</button>
+                            ))}
+                        </nav>
                     </div>
-                ))}
-            </aside>
-            <main className="flex-1 flex flex-col bg-gray-850 overflow-hidden">
-                <div className="p-4 border-b border-gray-700 flex-shrink-0">
-                    {renderFeatureUI()}
+                    <div className="flex-1 p-4 overflow-y-auto">
+                        {renderEditorDashboard()}
+                    </div>
                 </div>
-                <div className="flex-1 p-4 overflow-y-auto">
+                <div className="flex-1 p-4 overflow-y-auto bg-black/20">
                      <div className="w-full h-full bg-white rounded-lg shadow-lg">
                         <iframe 
                             srcDoc={websiteHtml} 
