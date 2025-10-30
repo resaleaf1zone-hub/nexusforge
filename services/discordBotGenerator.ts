@@ -1,3 +1,4 @@
+
 import type { BotConfig } from '../types';
 
 const formatPython = (obj: any): string => {
@@ -153,10 +154,16 @@ class TicketCreationView(discord.ui.View):
 
 async def handle_ticket_creation(interaction: discord.Interaction):
     try:
-        if not (interaction.type == discord.InteractionType.component and interaction.data['custom_id'].startswith('create_ticket_')):
+        # Check if it's a component interaction (e.g., button click)
+        if interaction.type != discord.InteractionType.component:
+            return
+        
+        # Safely access custom_id and check if it's for ticket creation
+        custom_id = interaction.data.get('custom_id', '')
+        if not custom_id.startswith('create_ticket_'):
             return
 
-        panel_id = interaction.data['custom_id'].split('_')[-1]
+        panel_id = custom_id.split('_')[-1]
         panel_config = next((p for p in TICKET_PANELS if p['id'] == panel_id), None)
         
         if not panel_config:
@@ -218,15 +225,17 @@ async def handle_ticket_creation(interaction: discord.Interaction):
     except Exception as e:
         print(f"Error during interaction: {e}")
         try:
-            await interaction.followup.send("An unexpected error occurred while creating your ticket. Please contact an admin.", ephemeral=True)
+            if not interaction.response.is_done():
+                await interaction.followup.send("An unexpected error occurred while creating your ticket. Please contact an admin.", ephemeral=True)
         except discord.errors.InteractionResponded:
             pass # Already responded
 
 @bot.event
 async def on_interaction(interaction: discord.Interaction):
     await handle_ticket_creation(interaction)
-    # If you have other interaction handlers, you can call them here
-    # await bot.process_application_commands(interaction) # if using slash commands
+    # This is a basic handler. For a real bot, you might need to route interactions
+    # or process application commands if you add them.
+    # e.g., await bot.process_application_commands(interaction)
 
 
 @bot.command()
@@ -342,8 +351,8 @@ else:
     except discord.errors.LoginFailure:
         print("ERROR: Failed to log in. Please ensure your bot token is correct.")
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-  `;
+        print(f"An unexpected error occurred: {e}")`;
 
-  return code.trim();
+  // FIX: Added missing return statement. The function is declared to return a string.
+  return code;
 };
