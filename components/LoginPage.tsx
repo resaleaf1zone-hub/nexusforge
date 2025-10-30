@@ -9,16 +9,16 @@ const CheckIcon = () => (
 );
 
 const PlanCard: React.FC<{ plan: Plan, price: string, priceSubtitle: string, features: string[], onSelect: (plan: Plan) => void, popular?: boolean }> = ({ plan, price, priceSubtitle, features, onSelect, popular }) => (
-    <div className={`relative bg-gray-800/50 border border-gray-700 p-6 rounded-lg flex flex-col hover:border-primary transition-all duration-300 transform hover:-translate-y-2 ${popular ? 'border-primary shadow-lg shadow-primary' : ''}`}>
-        {popular && <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">POPULAR</div>}
+    <div className={`relative p-6 rounded-2xl flex flex-col transition-all duration-300 transform hover:-translate-y-2 group glass-card hover:border-primary/80 ${popular ? 'border-primary shadow-lg shadow-primary' : 'border-[var(--card-border-color)]'}`}>
+        {popular && <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse-glow">POPULAR</div>}
         <h3 className="text-2xl font-bold text-center text-white">{plan}</h3>
         <p className="text-4xl font-extrabold text-center my-4">{price}<span className="text-base font-medium text-gray-400">{priceSubtitle}</span></p>
-        <ul className="space-y-3 text-sm text-gray-300">
+        <ul className="space-y-3 text-sm text-gray-300 mb-6">
             {features.map((feature, i) => (
                 <li key={i} className="flex items-start"><CheckIcon /> {feature}</li>
             ))}
         </ul>
-        <button onClick={() => onSelect(plan)} className={`w-full mt-auto py-2 px-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 ${popular ? 'bg-primary hover:bg-primary-hover text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-200'}`}>
+        <button onClick={() => onSelect(plan)} className={`w-full mt-auto py-2 px-4 rounded-lg font-semibold transition-all duration-300 transform group-hover:scale-105 ${popular ? 'bg-primary hover:bg-primary-hover text-white' : 'bg-white/10 group-hover:bg-primary text-gray-200'}`}>
             {plan === 'Free' ? 'Get Started' : 'Choose Plan'}
         </button>
     </div>
@@ -52,7 +52,7 @@ const LoginPage: React.FC = () => {
         <span className={`font-medium transition-colors ${cycle === 'monthly' ? 'text-white' : 'text-gray-400'}`}>Monthly</span>
         <label className="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" checked={cycle === 'yearly'} onChange={() => setCycle(cycle === 'monthly' ? 'yearly' : 'monthly')} className="sr-only peer" />
-            <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            <div className="w-11 h-6 bg-white/10 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
         </label>
         <span className={`font-medium transition-colors ${cycle === 'yearly' ? 'text-white' : 'text-gray-400'}`}>
             Yearly <span className="text-xs text-green-400">(Save ~16%)</span>
@@ -61,10 +61,10 @@ const LoginPage: React.FC = () => {
 );
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-grid-gray-700/[0.2] py-12 px-4 sm:px-6 lg:px-8 snow-bg">
-      <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-gray-900 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+    <div className="flex items-center justify-center min-h-screen bg-grid py-12 px-4 sm:px-6 lg:px-8 snow-bg">
+      <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-[var(--bg-color)] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
       <div className="w-full max-w-7xl mx-auto z-10">
-        <div className="w-full max-w-md mx-auto p-8 space-y-8 bg-gray-900/80 backdrop-blur-sm border border-primary/30 rounded-2xl shadow-2xl shadow-primary animate-slide-in-top">
+        <div className="w-full max-w-md mx-auto p-8 space-y-8 glass-card rounded-2xl shadow-2xl shadow-primary/50 animate-slide-in-top">
             <div className="text-center">
                 <h1 className="text-4xl font-bold text-gray-100 seasonal-header">
                     Nexus<span className="text-primary">Forge</span>
@@ -83,7 +83,7 @@ const LoginPage: React.FC = () => {
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="mt-1 block w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
+                    className="mt-1 block w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
                     placeholder="enter_your_handle"
                     />
                 </div>
@@ -98,7 +98,7 @@ const LoginPage: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 block w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
+                    className="mt-1 block w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
                     placeholder="your@email.com"
                     />
                 </div>
@@ -113,7 +113,7 @@ const LoginPage: React.FC = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 block w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
+                    className="mt-1 block w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300"
                     placeholder="••••••••"
                     />
                 </div>
