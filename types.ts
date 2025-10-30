@@ -1,3 +1,4 @@
+
 export enum Page {
   LOGIN = 'LOGIN',
   DASHBOARD = 'DASHBOARD',
@@ -323,6 +324,12 @@ export interface WebsiteConfig {
     shippingOptions: ShippingOption[];
   };
   orders: Order[];
+  analytics: { // Mock analytics data
+    totalVisits: number;
+    uniqueVisitors: number;
+    pageViews: Record<string, number>;
+    referrers: Record<string, number>;
+  },
   customHtml: string;
   customCss: string;
   customJs: string;
@@ -357,6 +364,7 @@ export interface AppContextType {
   announcement: { message: string, active: boolean };
   newProjectName: string | null;
   customImages: string[];
+  customTemplates: WebsiteTemplate[];
   login: (username: string, email: string, password: string, plan?: Plan) => void;
   logout: () => void;
   updateUser: (userId: string, updates: Partial<Pick<User, 'username' | 'email' | 'password'>>) => void;
@@ -383,4 +391,5 @@ export interface AppContextType {
   setNewProjectName: (name: string | null) => void;
   syncBotData: (projectId: string, data: { channels: string[], roles: string[] }) => void;
   addCustomImage: (imageDataUrl: string) => void;
+  addCustomTemplate: (template: WebsiteTemplate) => void;
 }
