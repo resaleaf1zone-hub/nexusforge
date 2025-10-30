@@ -1,6 +1,8 @@
+
 import React, { useState, useContext } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { Plan } from '../types';
+import Logo from './Logo';
 
 const CheckIcon = () => (
     <svg className="w-5 h-5 mr-2 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24" stroke="currentColor">
@@ -25,7 +27,8 @@ const PlanCard: React.FC<{ plan: Plan, price: string, priceSubtitle: string, fea
 );
 
 
-const LoginPage: React.FC = () => {
+// FIX: The component was missing an export statement. Changed to a named export.
+export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -66,9 +69,9 @@ const LoginPage: React.FC = () => {
       <div className="w-full max-w-7xl mx-auto z-10">
         <div className="w-full max-w-md mx-auto p-8 space-y-8 glass-card rounded-2xl shadow-2xl shadow-primary/50 animate-slide-in-top">
             <div className="text-center">
-                <h1 className="text-4xl font-bold text-gray-100 seasonal-header">
-                    Nexus<span className="text-primary">Forge</span>
-                </h1>
+                <div className="flex justify-center mb-2">
+                    <Logo className="h-10" />
+                </div>
                 <p className="mt-2 text-gray-400">Your portal to creation. Login or create an account.</p>
             </div>
             <form className="space-y-6" onSubmit={handleSubmit}>
@@ -176,12 +179,14 @@ const LoginPage: React.FC = () => {
                     plan="Enterprise"
                     price="Contact Us"
                     priceSubtitle=""
+                    // FIX: Added missing 'features' and 'onSelect' props to satisfy PlanCard component's type.
                     features={[
-                        "Unlimited Project Creation",
+                        "Unlimited Projects",
                         "Unlimited Published Projects",
-                        "Team Collaboration",
+                        "All Premium Features",
+                        "Dedicated Support & SLA",
                         "Custom Integrations",
-                        "Dedicated Support",
+                        "White-labeling Options",
                     ]}
                     onSelect={handlePlanSelect}
                 />
@@ -191,5 +196,3 @@ const LoginPage: React.FC = () => {
     </div>
   );
 };
-
-export default LoginPage;
