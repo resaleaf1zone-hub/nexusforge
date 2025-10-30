@@ -5,8 +5,8 @@ import { Page, Plan, UserRole } from '../types';
 type AdminTab = 'dashboard' | 'users' | 'tickets' | 'projects' | 'bans' | 'api' | 'maintenance' | 'settings' | 'logs';
 
 const StatCard: React.FC<{ title: string; value: string | number; icon: string }> = ({ title, value, icon }) => (
-    <div className="bg-gray-700 p-4 rounded-lg flex items-center">
-        <div className="p-3 rounded-full bg-primary/20 text-primary mr-4">{icon}</div>
+    <div className="glass-card p-4 rounded-lg flex items-center">
+        <div className="p-3 rounded-full bg-primary/20 text-primary mr-4 text-2xl">{icon}</div>
         <div>
             <p className="text-2xl font-bold text-gray-100">{value}</p>
             <p className="text-sm text-gray-400">{title}</p>
@@ -21,7 +21,7 @@ const MaintenanceToggle: React.FC<{ featureName: string }> = ({ featureName }) =
     const isEnabled = !maintenanceFlags[featureName];
 
     return (
-        <div className="bg-gray-700 p-4 rounded-md flex justify-between items-center">
+        <div className="bg-white/5 p-4 rounded-md flex justify-between items-center">
             <div>
                 <h3 className="font-bold text-gray-100">{featureName}</h3>
                 <p className={`text-sm ${isEnabled ? 'text-green-400' : 'text-yellow-400'}`}>
@@ -78,10 +78,10 @@ const AdminPanelPage: React.FC = () => {
     }, {} as Record<Plan, number>);
 
     return (
-        <div className="min-h-screen bg-gray-900">
-            <header className="flex justify-between items-center p-4 bg-gray-800/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-10">
+        <div className="min-h-screen bg-grid">
+            <header className="flex justify-between items-center p-4 bg-black/30 backdrop-blur-lg border-b border-[var(--border-color)] sticky top-0 z-10">
                 <h1 className="text-2xl font-bold seasonal-header">Admin Panel</h1>
-                <button onClick={() => context?.navigate(Page.DASHBOARD)} className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800 rounded-md hover:bg-gray-700 transition">
+                <button onClick={() => context?.navigate(Page.DASHBOARD)} className="px-4 py-2 text-sm font-medium text-gray-300 bg-white/5 rounded-md hover:bg-white/10 transition">
                     &larr; Back to Dashboard
                 </button>
             </header>
@@ -113,9 +113,9 @@ const AdminPanelPage: React.FC = () => {
                             <StatCard title="Open Tickets" value={openTickets.length} icon="🎫" />
                             <StatCard title="Banned IPs" value={context.bannedIPs.length} icon="🚫" />
                         </div>
-                        <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                        <div className="glass-card p-6 rounded-lg">
                             <h2 className="text-xl font-bold mb-4">User Plan Distribution</h2>
-                            <div className="bg-gray-700 p-4 rounded-md">
+                            <div className="bg-black/20 p-4 rounded-md">
                                 <div className="flex justify-around">
                                     {plans.map(plan => (
                                         <div key={plan} className="text-center">
@@ -129,8 +129,9 @@ const AdminPanelPage: React.FC = () => {
                     </div>
                 )}
                 {activeTab === 'users' && (
-                    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 animate-fade-in">
+                    <div className="glass-card p-6 rounded-lg animate-fade-in">
                         <h2 className="text-xl font-bold mb-4">Users</h2>
+                        {/* Desktop Table */}
                         <div className="overflow-x-auto hidden md:block">
                             <table className="w-full min-w-max text-left">
                                 <thead>
@@ -140,7 +141,7 @@ const AdminPanelPage: React.FC = () => {
                                 </thead>
                                 <tbody>
                                     {context.users.map(u => (
-                                        <tr key={u.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+                                        <tr key={u.id} className="border-b border-gray-700 hover:bg-white/5">
                                             <td className="p-3">{u.username}</td>
                                             <td className="p-3">{u.email}</td>
                                             <td className="p-3 capitalize">
@@ -166,9 +167,10 @@ const AdminPanelPage: React.FC = () => {
                                 </tbody>
                             </table>
                         </div>
+                        {/* Mobile Cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
                             {context.users.map(u => (
-                                <div key={u.id} className="bg-gray-700/50 p-4 rounded-lg space-y-3">
+                                <div key={u.id} className="bg-white/5 p-4 rounded-lg space-y-3">
                                     <div>
                                         <p className="font-bold text-lg">{u.username}</p>
                                         <p className="text-sm text-gray-400">{u.email}</p>
@@ -189,9 +191,10 @@ const AdminPanelPage: React.FC = () => {
                     </div>
                 )}
                 {activeTab === 'projects' && (
-                     <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 animate-fade-in">
+                     <div className="glass-card p-6 rounded-lg animate-fade-in">
                         <h2 className="text-xl font-bold mb-4">All Projects</h2>
-                        <div className="overflow-x-auto">
+                        {/* Desktop Table */}
+                        <div className="overflow-x-auto hidden md:block">
                             <table className="w-full min-w-max text-left">
                                 <thead>
                                     <tr className="border-b border-gray-600">
@@ -200,7 +203,7 @@ const AdminPanelPage: React.FC = () => {
                                 </thead>
                                 <tbody>
                                     {context.projects.map(p => (
-                                        <tr key={p.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+                                        <tr key={p.id} className="border-b border-gray-700 hover:bg-white/5">
                                             <td className="p-3">{p.name}</td>
                                             <td className="p-3">{p.ownerUsername}</td>
                                             <td className="p-3 capitalize">{p.type}</td>
@@ -214,14 +217,30 @@ const AdminPanelPage: React.FC = () => {
                                 </tbody>
                             </table>
                         </div>
+                        {/* Mobile Cards */}
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+                            {context.projects.map(p => (
+                                <div key={p.id} className="bg-white/5 p-4 rounded-lg space-y-2">
+                                    <div className="flex justify-between">
+                                        <p className="font-bold text-lg">{p.name}</p>
+                                         <button onClick={() => handleDeleteProject(p.id)} className="px-3 py-1 text-xs bg-red-600 hover:bg-red-700 rounded transition">Delete</button>
+                                    </div>
+                                    <p className="text-sm text-gray-400">Owner: {p.ownerUsername}</p>
+                                    <div className="flex justify-between text-sm pt-2 border-t border-gray-600">
+                                        <span className="capitalize font-semibold">{p.type}</span>
+                                        <span className="capitalize">{p.hostingStatus}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
                 {activeTab === 'tickets' && (
-                     <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 animate-fade-in">
+                     <div className="glass-card p-6 rounded-lg animate-fade-in">
                         <h2 className="text-xl font-bold mb-4">Open Support Tickets</h2>
                         <div className="space-y-4">
                             {openTickets.length > 0 ? openTickets.map(t => (
-                                <div key={t.id} className="bg-gray-700 p-4 rounded-md">
+                                <div key={t.id} className="bg-white/5 p-4 rounded-md">
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <p className="font-bold">{t.subject} <span className="font-normal text-gray-400">- from {t.username} on {new Date(t.createdAt).toLocaleDateString()}</span></p>
@@ -235,9 +254,9 @@ const AdminPanelPage: React.FC = () => {
                     </div>
                 )}
                 {activeTab === 'logs' && (
-                    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 animate-fade-in">
+                    <div className="glass-card p-6 rounded-lg animate-fade-in">
                         <h2 className="text-xl font-bold mb-4">System Event Logs</h2>
-                        <div className="bg-black p-4 rounded-md h-96 overflow-y-auto font-mono text-sm">
+                        <div className="bg-black/50 p-4 rounded-md h-96 overflow-y-auto font-mono text-sm">
                             {context.logs.map(log => {
                                 const levelColor = { info: 'text-blue-400', warn: 'text-yellow-400', error: 'text-red-400'}[log.level];
                                 return (
@@ -252,11 +271,11 @@ const AdminPanelPage: React.FC = () => {
                     </div>
                 )}
                 {activeTab === 'bans' && (
-                    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 animate-fade-in">
+                    <div className="glass-card p-6 rounded-lg animate-fade-in">
                         <h2 className="text-xl font-bold mb-4">Banned IP Addresses</h2>
                         <ul className="space-y-2">
                             {context.bannedIPs.length > 0 ? context.bannedIPs.map(ip => (
-                                <li key={ip} className="flex justify-between items-center bg-gray-700 p-3 rounded-md">
+                                <li key={ip} className="flex justify-between items-center bg-white/5 p-3 rounded-md">
                                     <span className="font-mono">{ip}</span>
                                     <button onClick={() => context.unbanUserIP(ip)} className="px-3 py-1 text-sm bg-yellow-600 hover:bg-yellow-700 rounded transition">Unban</button>
                                 </li>
@@ -265,7 +284,7 @@ const AdminPanelPage: React.FC = () => {
                     </div>
                 )}
                  {activeTab === 'api' && (
-                    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 animate-fade-in">
+                    <div className="glass-card p-6 rounded-lg animate-fade-in">
                         <h2 className="text-xl font-bold mb-4">API Key Management</h2>
                          <div className="overflow-x-auto">
                             <table className="w-full min-w-max text-left">
@@ -278,7 +297,7 @@ const AdminPanelPage: React.FC = () => {
                                 </thead>
                                 <tbody>
                                     {context.users.map(u => (
-                                        <tr key={u.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+                                        <tr key={u.id} className="border-b border-gray-700 hover:bg-white/5">
                                             <td className="p-3">{u.username} <span className="text-xs text-purple-400 ml-1">({u.role})</span></td>
                                             <td className="p-3 font-mono">
                                                 {u.apiKey ? `${u.apiKey.substring(0, 10)}...` : <span className="text-gray-500">No key assigned</span>}
@@ -299,7 +318,7 @@ const AdminPanelPage: React.FC = () => {
                     </div>
                 )}
                 {activeTab === 'maintenance' && (
-                    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 animate-fade-in">
+                    <div className="glass-card p-6 rounded-lg animate-fade-in">
                         <h2 className="text-xl font-bold mb-4">Maintenance Mode</h2>
                         <div className="space-y-4">
                             <MaintenanceToggle featureName="Bot Builder" />
@@ -310,24 +329,24 @@ const AdminPanelPage: React.FC = () => {
                 )}
                  {activeTab === 'settings' && (
                     <div className="animate-fade-in space-y-6">
-                        <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                        <div className="glass-card p-6 rounded-lg">
                             <h2 className="text-xl font-bold mb-4">Global Announcement</h2>
                              <textarea 
                                 placeholder="Enter announcement text here... This will be shown as a popup to all users." 
                                 value={announcementText} 
                                 onChange={e => setAnnouncementText(e.target.value)} 
                                 rows={3} 
-                                className="w-full bg-gray-700 p-2 rounded-md" 
+                                className="w-full bg-white/5 p-2 rounded-md" 
                             />
                             <div className="flex gap-4 mt-2">
                                 <button onClick={handleSetAnnouncement} className="px-4 py-2 text-sm bg-primary hover:bg-primary-hover rounded-md">Broadcast Announcement</button>
-                                <button onClick={handleDeactivateAnnouncement} className="px-4 py-2 text-sm bg-gray-600 hover:bg-gray-500 rounded-md">Deactivate</button>
+                                <button onClick={handleDeactivateAnnouncement} className="px-4 py-2 text-sm bg-white/10 hover:bg-white/20 rounded-md">Deactivate</button>
                             </div>
                         </div>
-                        <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                        <div className="glass-card p-6 rounded-lg">
                             <h2 className="text-xl font-bold mb-4">Feature Flags</h2>
                             <div className="space-y-4">
-                                <div className="bg-gray-700 p-4 rounded-md flex justify-between items-center">
+                                <div className="bg-white/5 p-4 rounded-md flex justify-between items-center">
                                     <div>
                                         <h3 className="font-bold text-gray-100">Customer Support Widget</h3>
                                         <p className="text-sm text-gray-400">Toggles the support chat bubble across the entire platform.</p>
