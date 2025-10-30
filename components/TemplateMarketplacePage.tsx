@@ -1,3 +1,4 @@
+
 import React, { useContext } from 'react';
 import { AppContext } from '../contexts/AppContext';
 import { Page, WebsiteTemplate } from '../types';
@@ -14,7 +15,7 @@ const TemplateCard: React.FC<{ template: WebsiteTemplate, onSelect: () => void }
                 <p className="text-sm text-gray-400 h-10 my-2">{template.description}</p>
                 <div className="flex flex-wrap gap-2 my-3">
                     {template.tags.map(tag => (
-                        <span key={tag} className="px-2 py-1 text-xs font-semibold rounded-full bg-primary/20 text-primary">{tag}</span>
+                        <span key={tag} className={`px-2 py-1 text-xs font-semibold rounded-full ${tag === 'Custom' ? 'bg-purple-600/20 text-purple-400' : 'bg-primary/20 text-primary'}`}>{tag}</span>
                     ))}
                 </div>
                 <button onClick={onSelect} className="w-full mt-2 py-2 bg-primary rounded-md font-semibold hover:bg-primary-hover transition">
@@ -40,6 +41,8 @@ const TemplateMarketplacePage: React.FC = () => {
         context.setNewProjectName(null);
         context.navigate(Page.DASHBOARD);
     };
+    
+    const customTemplates = context?.customTemplates || [];
 
     return (
         <div className="min-h-screen bg-gray-900 animate-fade-in">
@@ -53,6 +56,18 @@ const TemplateMarketplacePage: React.FC = () => {
                 </button>
             </header>
             <main className="p-8">
+                 {customTemplates.length > 0 && (
+                    <div className="mb-16">
+                        <h2 className="text-3xl font-bold text-center mb-6">Your Templates</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                           {customTemplates.map(template => (
+                                <TemplateCard key={template.id} template={template} onSelect={() => handleSelectTemplate(template)} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+                
+                <h2 className="text-3xl font-bold text-center mb-6">Featured Templates</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {websiteTemplates.map(template => (
                         <TemplateCard key={template.id} template={template} onSelect={() => handleSelectTemplate(template)} />
