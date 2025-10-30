@@ -42,10 +42,10 @@ const SettingsPage: React.FC = () => {
     const { user, upgradePlan } = context;
 
     return (
-        <div className="min-h-screen bg-gray-900">
-            <header className="flex justify-between items-center p-4 bg-gray-800/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-10">
+        <div className="min-h-screen bg-grid">
+            <header className="flex justify-between items-center p-4 bg-black/30 backdrop-blur-lg border-b border-[var(--border-color)] sticky top-0 z-10">
                 <h1 className="text-2xl font-bold seasonal-header">Settings</h1>
-                <button onClick={() => context.navigate(Page.DASHBOARD)} className="px-4 py-2 text-sm font-medium text-gray-300 bg-gray-800 rounded-md hover:bg-gray-700 transition">
+                <button onClick={() => context.navigate(Page.DASHBOARD)} className="px-4 py-2 text-sm font-medium text-gray-300 bg-white/5 rounded-md hover:bg-white/10 transition">
                     &larr; Back to Dashboard
                 </button>
             </header>
@@ -61,24 +61,24 @@ const SettingsPage: React.FC = () => {
                 </div>
 
                 {activeTab === 'profile' && (
-                    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 animate-fade-in">
+                    <div className="glass-card p-6 rounded-lg animate-fade-in">
                         <h2 className="text-xl font-bold mb-4">Account Information</h2>
                         <form onSubmit={handleProfileUpdate} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">Username</label>
-                                <input type="text" value={username} onChange={e => setUsername(e.target.value)} className="w-full bg-gray-700 p-2 rounded-md" />
+                                <input type="text" value={username} onChange={e => setUsername(e.target.value)} className="w-full bg-white/5 p-2 rounded-md focus:ring-2 focus:ring-primary outline-none border border-transparent focus:border-primary transition" />
                             </div>
                              <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">Email</label>
-                                <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-gray-700 p-2 rounded-md" />
+                                <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-white/5 p-2 rounded-md focus:ring-2 focus:ring-primary outline-none border border-transparent focus:border-primary transition" />
                             </div>
                              <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">New Password</label>
-                                <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Leave blank to keep current password" className="w-full bg-gray-700 p-2 rounded-md" />
+                                <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Leave blank to keep current password" className="w-full bg-white/5 p-2 rounded-md focus:ring-2 focus:ring-primary outline-none border border-transparent focus:border-primary transition" />
                             </div>
                              <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1">Confirm New Password</label>
-                                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="w-full bg-gray-700 p-2 rounded-md" />
+                                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="w-full bg-white/5 p-2 rounded-md focus:ring-2 focus:ring-primary outline-none border border-transparent focus:border-primary transition" />
                             </div>
                             <div className="pt-4">
                                 <button type="submit" className="px-5 py-2 bg-primary rounded-lg font-semibold hover:bg-primary-hover transition">Save Changes</button>
@@ -87,9 +87,9 @@ const SettingsPage: React.FC = () => {
                     </div>
                 )}
                 {activeTab === 'plan' && (
-                    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 animate-fade-in">
+                    <div className="glass-card p-6 rounded-lg animate-fade-in">
                         <h2 className="text-xl font-bold mb-4">Your Plan</h2>
-                        <div className="bg-gray-700 p-4 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="bg-white/5 p-4 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div>
                                 <p className="text-lg font-semibold">You are currently on the <span className="text-primary">{user.plan}</span> plan.</p>
                                 <p className="text-sm text-gray-400">
@@ -106,9 +106,9 @@ const SettingsPage: React.FC = () => {
                     </div>
                 )}
                  {activeTab === 'api' && (
-                    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 animate-fade-in">
+                    <div className="glass-card p-6 rounded-lg animate-fade-in">
                         <h2 className="text-xl font-bold mb-4">Your API Key</h2>
-                        <div className="bg-gray-700 p-4 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="bg-white/5 p-4 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                            <div className="flex-grow">
                              <p className="font-mono text-sm break-all">{user.apiKey || 'No API key generated.'}</p>
                            </div>
