@@ -1,6 +1,7 @@
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import LoginPage from './components/LoginPage';
+// FIX: LoginPage is a named export, not a default export.
+import { LoginPage } from './components/LoginPage';
 import DashboardPage from './components/DashboardPage';
 // FIX: BotBuilderPage is a named export, not a default export.
 import { BotBuilderPage } from './components/BotBuilderPage';
