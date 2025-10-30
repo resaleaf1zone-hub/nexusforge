@@ -1,3 +1,4 @@
+
 import type { WebsiteTemplate, WebsiteConfig } from '../types';
 
 const defaultEcommerceConfig: WebsiteConfig['ecommerce'] = {
@@ -11,6 +12,13 @@ const defaultEcommerceConfig: WebsiteConfig['ecommerce'] = {
         { id: 's1', name: 'Standard', price: 4.99 },
         { id: 's2', name: 'Express', price: 14.99 },
     ]
+};
+
+const mockAnalytics: WebsiteConfig['analytics'] = {
+    totalVisits: 0,
+    uniqueVisitors: 0,
+    pageViews: {},
+    referrers: {}
 };
 
 export const websiteTemplates: WebsiteTemplate[] = [
@@ -49,6 +57,7 @@ export const websiteTemplates: WebsiteTemplate[] = [
             subcategories: [],
             ecommerce: defaultEcommerceConfig,
             orders: [],
+            analytics: mockAnalytics,
             customCss: '', customHtml: '', customJs: '',
         }
     },
@@ -82,6 +91,7 @@ export const websiteTemplates: WebsiteTemplate[] = [
             subcategories: [],
             ecommerce: defaultEcommerceConfig,
             orders: [],
+            analytics: mockAnalytics,
             customCss: '', customHtml: '', customJs: '',
         }
     },
@@ -115,6 +125,7 @@ export const websiteTemplates: WebsiteTemplate[] = [
             subcategories: [],
             ecommerce: defaultEcommerceConfig,
             orders: [],
+            analytics: mockAnalytics,
             customCss: '', customHtml: '', customJs: '',
         }
     },
