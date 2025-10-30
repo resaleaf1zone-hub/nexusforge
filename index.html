@@ -1,38 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF--8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NexusForge: Bot & Web Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Creepster&family=Mountains+of+Christmas:wght@700&family=Roboto:wght@400;700&family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Creepster&family=Mountains+of+Christmas:wght@700&family=Roboto:wght@400;700&family=Poppins:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
       body {
-        --primary-color: #3b82f6; /* Default Blue */
-        --primary-hover-color: #2563eb;
-        --primary-shadow-color: rgba(59, 130, 246, 0.2);
+        --primary-color: #4f46e5; /* Indigo-600 */
+        --primary-hover-color: #6366f1; /* Indigo-500 */
+        --primary-glow-color: rgba(79, 70, 229, 0.4);
+        --bg-color: #03040B;
+        --card-bg-color: rgba(17, 24, 39, 0.5); /* Semi-transparent blue-gray */
+        --card-border-color: rgba(255, 255, 255, 0.1);
+        --card-blur: 16px;
+        --border-color: rgba(255, 255, 255, 0.08); /* More subtle grid */
         font-family: 'Inter', sans-serif;
+        background-color: var(--bg-color);
+        background-image: radial-gradient(ellipse at top, rgba(79, 70, 229, 0.15) 0%, transparent 50%);
       }
-      /* Custom Scrollbar */
+      ::selection {
+        background-color: var(--primary-color);
+        color: white;
+      }
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #1f2937; /* A slightly lighter shade of the main bg */
+        background: transparent;
       }
       ::-webkit-scrollbar-thumb {
-        background: #4b5563;
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
         background: var(--primary-color);
       }
       
-      /* Animation Keyframes */
       @keyframes fadeIn {
         from { opacity: 0; }
         to { opacity: 1; }
@@ -50,14 +59,8 @@
         to { opacity: 1; transform: translateY(0); }
       }
       @keyframes staggeredFadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
       }
       @keyframes snowfall {
         0% { background-position: 0 0; }
@@ -65,10 +68,10 @@
       }
       @keyframes pulse-glow {
         0%, 100% {
-          box-shadow: 0 0 15px 0 var(--primary-shadow-color);
+          box-shadow: 0 0 5px 0 var(--primary-glow-color), 0 0 10px 0 var(--primary-glow-color);
         }
         50% {
-           box-shadow: 0 0 25px 5px var(--primary-shadow-color);
+           box-shadow: 0 0 15px 3px var(--primary-glow-color), 0 0 25px 5px var(--primary-glow-color);
         }
       }
 
@@ -89,14 +92,13 @@
         opacity: 0;
       }
       .animate-pulse-glow {
-          animation: pulse-glow 2s infinite ease-in-out;
+          animation: pulse-glow 2.5s infinite ease-in-out;
       }
       
-      /* Seasonal Themes */
       .theme-halloween {
         --primary-color: #f97316;
         --primary-hover-color: #ea580c;
-        --primary-shadow-color: rgba(249, 115, 22, 0.2);
+        --primary-glow-color: rgba(249, 115, 22, 0.3);
       }
       .theme-halloween .seasonal-header {
         font-family: 'Creepster', cursive;
@@ -105,7 +107,7 @@
       .theme-christmas {
         --primary-color: #dc2626;
         --primary-hover-color: #b91c1c;
-        --primary-shadow-color: rgba(220, 38, 38, 0.2);
+        --primary-glow-color: rgba(220, 38, 38, 0.3);
       }
       .theme-christmas .seasonal-header {
          font-family: 'Mountains of Christmas', cursive;
@@ -117,13 +119,30 @@
         animation: snowfall 20s linear infinite;
       }
       
-      /* Tailwind custom color integration */
       .bg-primary { background-color: var(--primary-color); }
       .hover\:bg-primary-hover:hover { background-color: var(--primary-hover-color); }
       .border-primary { border-color: var(--primary-color); }
       .text-primary { color: var(--primary-color); }
-      .shadow-primary { box-shadow: 0 0 15px 0 var(--primary-shadow-color); }
+      .shadow-primary { box-shadow: 0 0 20px 0 var(--primary-glow-color); }
       .ring-primary { --tw-ring-color: var(--primary-color); }
+
+      .bg-grid {
+        background-image:
+          linear-gradient(to right, var(--border-color) 1px, transparent 1px),
+          linear-gradient(to bottom, var(--border-color) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+
+      .glass-card {
+        background: var(--card-bg-color);
+        backdrop-filter: blur(var(--card-blur));
+        -webkit-backdrop-filter: blur(var(--card-blur));
+        border: 1px solid var(--card-border-color);
+      }
+
+      code, pre, .font-mono {
+        font-family: 'Roboto Mono', monospace;
+      }
     </style>
   <script type="importmap">
 {
@@ -135,9 +154,8 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-gray-900 text-gray-100">
+  <body class="text-gray-100">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
